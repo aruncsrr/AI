@@ -1,0 +1,17 @@
+{
+  "name": "cdd-knowledge-pipeline",
+  "version": "1.0.0",
+  "description": "CDD/NCDD ABAP knowledge crawl pipeline for /HEC1/CP_CDD and /HEC1/CP_NCDD",
+  "type": "module",
+  "scripts": {
+    "phase1": "node cdd-crawler.js --phase 1",
+    "phase2": "node cdd-crawler.js --phase 2 --concurrency 5 --batch 6",
+    "phase3": "node cdd-crawler.js --phase 3",
+    "fix": "node fix-manifest.js",
+    "graph": "node graph-builder.js",
+    "export": "node export-builder.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: jco-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+sap:
+  host: ${SAP_HOST:}
+  sysnr: ${SAP_SYSNR:00}
+  client: ${SAP_CLIENT:}
+  username: ${SAP_USERNAME:}
+  password: ${SAP_PASSWORD:}
+  adt:
+    base-url: ${SAP_ADT_URL:https://${sap.host}:8000/sap/bc/adt}
+    # Enable dangerous operations (Create*/Delete* tools)
+    # Set SAP_ADT_DANGEROUS_OPERATIONS=true to enable
+    dangerous-operations:
+      enabled: ${SAP_ADT_DANGEROUS_OPERATIONS:false}
+
+logging:
+  level:
+    com.sapjco.mcp: DEBUG
+    com.sap.conn.jco: INFO

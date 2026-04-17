@@ -1,0 +1,47 @@
+# Java build output
+jco-service/target/
+
+# Environment and credentials
+.env
+.sap-systems.json
+
+# SAP JCo native libraries
+sapjco3-*/
+jco-service/lib/*.dll
+jco-service/lib/*.so
+jco-service/lib/*.dylib
+jco-service/lib/*.jnilib
+
+# OS files
+.DS_Store
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Git worktrees
+.worktrees/
+
+# Investigation scripts (keep locally, don't commit)
+investigation/
+
+# Knowledge pipeline output (large, generated files)
+knowledge/
+
+# Node.js (pipeline)
+pipeline/node_modules/
+
+# Auth cookies (sensitive)
+I766689/
+**/sap_cookies.json
+
+# SAP JCo JAR (proprietary, cannot be redistributed)
+jco-service/lib/sapjco3.jar
+
+# Misplaced JAR in jco-service root
+jco-service/ai-sap-abap-adt*.jar

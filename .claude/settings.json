@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kill 7843)",
+      "Bash(curl -s http://localhost:8080/actuator/health)",
+      "Bash(xargs cat:*)",
+      "Bash(xargs kill:*)",
+      "Read(//Users/I766689/Desktop/**)"
+    ]
+  },
+  "mcpServers": {
+    "sap-adt": {
+      "env": {
+        "SAP_WIKI_TOKEN": ""
+      }
+    },
+    "sap-jira": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "git+https://github.tools.sap/sfsfmcp/sap-jira-mcp.git"
+      ],
+      "env": {
+        "JIRA_DOMAIN": "jira.tools.sap",
+        "AUTH_COOKIE_DIR": "I766689"
+      }
+    }
+  }
+}

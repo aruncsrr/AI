@@ -1,0 +1,9 @@
+{
+  "systemId": "isd",
+  "rootPackages": ["/HEC1/CP_CDD", "/HEC1/CP_NCDD"],
+  "knowledgeDir": "../knowledge",
+  "javaServerUrl": "http://localhost:8080",
+  "javaCacheDir": "~/sap-ai-assistant/cdd-cache",
+  "maxConcurrency": 5,
+  "batchSize": 6
+}

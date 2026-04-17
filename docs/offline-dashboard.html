@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAP AI Assistant — Dashboard</title>
+<style>
+  :root {
+    --blue:   #0070f2;
+    --dark:   #003366;
+    --teal:   #0070a3;
+    --light:  #e8f0fe;
+    --green:  #166534;
+    --lgreen: #dcfce7;
+    --amber:  #92400e;
+    --lamber: #fef3c7;
+    --red:    #991b1b;
+    --lred:   #fee2e2;
+    --bg:     #f4f6f9;
+    --card:   #ffffff;
+    --border: #dde1e7;
+    --text:   #1a1d23;
+    --muted:  #6b7280;
+    --r:      10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SAP-icons', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, var(--dark) 0%, #0057a8 100%);
+    color: white;
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .hdr-left { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 38px; height: 38px;
+    background: var(--blue);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 17px; letter-spacing: -1px;
+  }
+  .hdr-title { font-size: 17px; font-weight: 700; }
+  .hdr-sub   { font-size: 11px; opacity: 0.65; margin-top: 1px; }
+  .hdr-right { display: flex; align-items: center; gap: 20px; }
+  .status-pill {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    transition: background 0.15s;
+  }
+  .status-pill:hover { background: rgba(255,255,255,0.18); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.online  { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+  .dot.offline { background: #f87171; }
+  .dot.checking { background: #fbbf24; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── Main layout ── */
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+
+  /* ── Section headers ── */
+  .sec-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+    margin: 32px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Cards grid ── */
+  .grid { display: grid; gap: 14px; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  @media(max-width:860px){
+    .grid-3,.grid-4 { grid-template-columns: repeat(2,1fr); }
+  }
+  @media(max-width:540px){
+    .grid-3,.grid-4,.grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px;
+    transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+  }
+  .card:hover {
+    box-shadow: 0 6px 24px rgba(0,60,150,0.10);
+    transform: translateY(-2px);
+    border-color: #b8caef;
+  }
+
+  /* Link card */
+  a.card {
+    display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; color: inherit;
+  }
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .card-title   { font-size: 14px; font-weight: 600; color: var(--text); }
+  .card-desc    { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+  .card-badge {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 600;
+    margin-top: 6px;
+  }
+  .badge-green { background: var(--lgreen); color: var(--green); }
+  .badge-amber { background: var(--lamber); color: var(--amber); }
+  .badge-red   { background: var(--lred);   color: var(--red); }
+  .badge-blue  { background: var(--light);  color: var(--dark); }
+
+  /* ── Launch card (prominent) ── */
+  .launch-card {
+    background: linear-gradient(135deg, var(--dark) 0%, #0057a8 100%);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .launch-card:hover {
+    box-shadow: 0 8px 30px rgba(0,60,150,0.35);
+    transform: translateY(-2px);
+    border-color: transparent;
+  }
+  .launch-card .card-title { color: white; font-size: 16px; }
+  .launch-card .card-desc  { color: rgba(255,255,255,0.75); font-size: 13px; }
+  .launch-icon {
+    width: 52px; height: 52px; min-width: 52px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .launch-arrow {
+    margin-left: auto;
+    font-size: 22px;
+    opacity: 0.7;
+  }
+
+  /* ── Command table ── */
+  .cmd-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cmd-table th {
+    background: #f0f4ff;
+    color: var(--dark);
+    text-align: left;
+    padding: 9px 14px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  .cmd-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .cmd-table tr:last-child td { border-bottom: none; }
+  .cmd-table tr:hover td { background: #fafbff; }
+  code {
+    background: #f0f2f5;
+    color: #1e3a5f;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .cmd-table td code { display: block; margin-bottom: 2px; }
+
+  /* ── Step list ── */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 30px; height: 30px; min-width: 30px;
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    margin-top: 1px;
+  }
+  .step-body {}
+  .step-title { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+  .step-detail { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .step-detail code { background: #eff1f5; }
+
+  /* ── Info boxes ── */
+  .infobox {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    border-left: 4px solid;
+    margin: 6px 0;
+  }
+  .infobox.green { background: var(--lgreen); border-color: #22c55e; color: var(--green); }
+  .infobox.amber { background: var(--lamber); border-color: #f59e0b; color: var(--amber); }
+  .infobox.blue  { background: var(--light);  border-color: var(--blue);  color: var(--dark); }
+
+  /* ── Tag pills ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+    background: var(--light); color: var(--dark);
+  }
+
+  /* ── Fiori dropdown ── */
+  .fiori-wrap { position: relative; display: inline-block; }
+  .fiori-btn {
+    background: var(--blue); color: white;
+    border: none; padding: 8px 16px;
+    border-radius: 7px; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .fiori-btn:hover { background: #0060d0; }
+  .fiori-menu {
+    display: none;
+    position: absolute; top: calc(100% + 6px); left: 0;
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.14);
+    min-width: 180px; overflow: hidden; z-index: 200;
+  }
+  .fiori-menu.open { display: block; }
+  .fiori-menu a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; font-size: 13px; color: var(--text);
+    text-decoration: none; font-weight: 500;
+  }
+  .fiori-menu a:hover { background: var(--light); color: var(--blue); }
+  .fiori-menu a + a { border-top: 1px solid #f0f0f0; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ────────────────────────────────────────────────────────────── -->
+<header>
+  <div class="hdr-left">
+    <div class="logo">SAP</div>
+    <div>
+      <div class="hdr-title">SAP AI Assistant</div>
+      <div class="hdr-sub">CDD · NCDD · ABAP · Wiki · Jira</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <a class="status-pill" href="http://localhost:8080" target="_blank" id="server-link">
+      <div class="dot checking" id="status-dot"></div>
+      <span id="status-text">Checking server…</span>
+    </a>
+    <div class="fiori-wrap" id="fioriWrap">
+      <button class="fiori-btn" onclick="toggleFiori()">
+        🌐 Fiori Launchpad <span style="font-size:11px">▾</span>
+      </button>
+      <div class="fiori-menu" id="fioriMenu">
+        <a href="https://isd.hec.net.sap/sap/bc/ui2/flp?sap-client=001&sap-language=EN#Shell-home" target="_blank">🔷 ISD — Development</a>
+        <a href="https://ist.hec.net.sap/sap/bc/ui2/flp?sap-client=001&sap-language=EN#Shell-home" target="_blank">🟢 IST — Test</a>
+        <a href="https://isp.hec.net.sap/sap/bc/ui2/flp?sap-client=001&sap-language=EN#Shell-home" target="_blank">🔴 ISP — Production</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Main content ───────────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Launch row -->
+  <div class="grid grid-2" style="margin-top:8px">
+    <a class="card launch-card" href="http://localhost:8080" target="_blank">
+      <div class="launch-icon">🤖</div>
+      <div>
+        <div class="card-title">Open AI Chat</div>
+        <div class="card-desc">Chat with Claude about SAP code, Wiki, Jira, and CDD/NCDD — 88 tools available</div>
+      </div>
+      <div class="launch-arrow">→</div>
+    </a>
+    <a class="card launch-card" href="docs/SAP-AI-Assistant-Complete-Reference.pdf" target="_blank"
+       style="background: linear-gradient(135deg,#1a3a5c,#2e6da4)">
+      <div class="launch-icon">📄</div>
+      <div>
+        <div class="card-title">Full Reference PDF</div>
+        <div class="card-desc">Complete technical documentation — architecture, pipeline, CDD/NCDD domain knowledge</div>
+      </div>
+      <div class="launch-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- Server status card -->
+  <div class="sec-title">Server Status</div>
+  <div id="server-status-card" class="card infobox amber">
+    Checking server at <code>http://localhost:8080</code>…
+  </div>
+
+  <!-- Quick actions -->
+  <div class="sec-title">Quick Links</div>
+  <div class="grid grid-4">
+    <a class="card" href="https://one.int.sap/home" target="_blank">
+      <div class="card-icon" style="background:#e8f0fe">🌐</div>
+      <div class="card-title">SAP One</div>
+      <div class="card-desc">Internal SAP portal</div>
+    </a>
+    <a class="card" href="https://jira.tools.sap/secure/RapidBoard.jspa?rapidView=53514&view=planning.nodetail&quickFilter=314107" target="_blank">
+      <div class="card-icon" style="background:#e6f4ea">📋</div>
+      <div class="card-title">Jira Board</div>
+      <div class="card-desc">Sprint planning &amp; backlog</div>
+    </a>
+    <a class="card" href="https://jira.tools.sap/browse/APC-1213?jql=project%20%3D%20APC%20AND%20status%20in%20(%22Ready%20for%20Development%22%2C%20%22In%20Progress%22%2C%20%22In%20Refinement%22)%20AND%20Architect%20in%20(I766689)%20ORDER%20BY%20created%20DESC" target="_blank">
+      <div class="card-icon" style="background:#fff3e0">🏗️</div>
+      <div class="card-title">My APC Items</div>
+      <div class="card-desc">Architecture proposals assigned to me</div>
+    </a>
+    <a class="card" href="https://itsm.services.sap/now/sow/record/incident/3439722dcffb7214f2adf08e5d851cfe" target="_blank">
+      <div class="card-icon" style="background:#fce8e8">🎫</div>
+      <div class="card-title">ITSM Ticket</div>
+      <div class="card-desc">Open incident</div>
+    </a>
+  </div>
+
+  <!-- CDD/NCDD tools -->
+  <div class="sec-title">CDD / NCDD Offline Tools (No SAP Needed)</div>
+  <div class="grid grid-3">
+    <div class="card">
+      <div class="card-icon" style="background:#e8f0fe">📚</div>
+      <div class="card-title">cdd_knowledge_base</div>
+      <div class="card-desc">Architecture overview of /HEC1/CP_CDD and /HEC1/CP_NCDD. Returns bundled knowledge base.</div>
+      <div class="tags">
+        <span class="tag">Offline</span>
+        <span class="tag">No SAP</span>
+        <span class="tag">MCP Tool</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#e6f4ea">🔍</div>
+      <div class="card-title">cdd_local_search</div>
+      <div class="card-desc">Full-text search of local cache by class name, description, or package. Filter by type.</div>
+      <div class="tags">
+        <span class="tag">Offline</span>
+        <span class="tag">No SAP</span>
+        <span class="tag">MCP Tool</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#fff3e0">💻</div>
+      <div class="card-title">cdd_local_get_code</div>
+      <div class="card-desc">Returns full ABAP source. Cache hit = instant (no SAP). Cache miss = live fetch from ISD.</div>
+      <div class="tags">
+        <span class="tag">Cache-first</span>
+        <span class="tag">SAP fallback</span>
+        <span class="tag">MCP Tool</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- How to run -->
+  <div class="sec-title">How to Run Locally</div>
+  <div class="card" style="padding:0; overflow:hidden">
+    <div class="steps" style="padding:4px 24px">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Build the JAR (one-time)</div>
+          <div class="step-detail">
+            Open Terminal in the project folder:<br>
+            <code>cd ~/Desktop/sap-ai-assistant/jco-service &amp;&amp; mvn clean package</code><br>
+            Takes ~2 min. Produces <code>target/jco-service-1.0.0.jar</code>. Requires Java 17 and Maven.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Start the web server</div>
+          <div class="step-detail">
+            <code>cd ~/Desktop/sap-ai-assistant &amp;&amp; ./start-sap-assistant.sh</code><br>
+            This launches the AI chat UI. Browser opens automatically at <code>http://localhost:8080</code>.<br>
+            <strong>Bookmark that URL</strong> — it works offline (SAP calls optional).
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Use as MCP server (for Claude Code CLI)</div>
+          <div class="step-detail">
+            <code>./start-sap-assistant.sh --mcp</code><br>
+            Add to Claude Code's MCP config (<code>~/.claude/mcp_settings.json</code>).
+            88 tools become available in Claude Code conversations.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Run the knowledge pipeline (one-time, SAP required)</div>
+          <div class="step-detail">
+            Start the Java server first (step 2), then in a second terminal:<br>
+            <code>cd ~/Desktop/sap-ai-assistant/pipeline</code><br>
+            <code>node cdd-crawler.js --phase 1</code> &nbsp;&nbsp;— discovers all objects (~30 min)<br>
+            <code>node cdd-crawler.js --phase 2 --concurrency 5</code> &nbsp;&nbsp;— downloads code (~2–4 hrs)<br>
+            <code>node cdd-crawler.js --phase 3</code> &nbsp;&nbsp;— where-used analysis (~30 min)<br>
+            <code>node graph-builder.js &amp;&amp; node export-builder.js &amp;&amp; node sync-java-cache.js</code><br>
+            After this, everything works fully offline.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Resume an interrupted crawl</div>
+          <div class="step-detail">
+            <code>node fix-manifest.js &amp;&amp; node cdd-crawler.js --phase 2 --concurrency 5</code><br>
+            The crawler resumes from where it stopped — already-downloaded objects are skipped.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Command reference -->
+  <div class="sec-title">Key Commands Reference</div>
+  <div class="card" style="padding:0; overflow:hidden">
+    <table class="cmd-table">
+      <thead>
+        <tr><th style="width:35%">Command</th><th>What it does</th><th style="width:100px">SAP needed?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>./start-sap-assistant.sh</code></td>
+          <td>Start web UI on http://localhost:8080 (auto-opens browser)</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>./start-sap-assistant.sh --mcp</code></td>
+          <td>Start as MCP STDIO server for Claude Code</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>./start-sap-assistant.sh --port 9090</code></td>
+          <td>Start web UI on a custom port</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>cd jco-service &amp;&amp; mvn clean package</code></td>
+          <td>Build / rebuild the JAR (run after code changes)</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>node cdd-crawler.js --phase 1</code></td>
+          <td>Discover all sub-packages and objects in /HEC1/CP_CDD + /HEC1/CP_NCDD</td>
+          <td><span class="card-badge badge-amber">YES</span></td>
+        </tr>
+        <tr>
+          <td><code>node cdd-crawler.js --phase 2 --concurrency 5</code></td>
+          <td>Download source code for every object + run code analysis</td>
+          <td><span class="card-badge badge-amber">YES</span></td>
+        </tr>
+        <tr>
+          <td><code>node cdd-crawler.js --phase 3</code></td>
+          <td>Find callers (where-used) for all interfaces and key classes</td>
+          <td><span class="card-badge badge-amber">YES</span></td>
+        </tr>
+        <tr>
+          <td><code>node fix-manifest.js</code></td>
+          <td>Repair manifest after interrupted crawl (sync disk → manifest)</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>node graph-builder.js</code></td>
+          <td>Build dependency graph (index.json, edges.json, mind-map.json)</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>node export-builder.js</code></td>
+          <td>Generate cdd-system-prompt.md (2000+ lines) for /cdd-knowledge command</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+        <tr>
+          <td><code>node sync-java-cache.js</code></td>
+          <td>Copy crawled source to Java offline cache, hot-reload index</td>
+          <td><span class="card-badge badge-green">No</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- File paths -->
+  <div class="sec-title">Important File Paths</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px">Project Files</div>
+      <table class="cmd-table" style="font-size:12px">
+        <tr><td style="color:var(--muted);width:48%">Start script</td><td><code>./start-sap-assistant.sh</code></td></tr>
+        <tr><td style="color:var(--muted)">Java JAR</td><td><code>jco-service/target/jco-service-1.0.0.jar</code></td></tr>
+        <tr><td style="color:var(--muted)">SAP systems</td><td><code>.sap-systems.json</code> (gitignored)</td></tr>
+        <tr><td style="color:var(--muted)">Pipeline config</td><td><code>pipeline/pipeline-config.json</code></td></tr>
+        <tr><td style="color:var(--muted)">Web UI</td><td><code>jco-service/src/main/resources/static/index.html</code></td></tr>
+        <tr><td style="color:var(--muted)">Reference PDF</td><td><code>docs/SAP-AI-Assistant-Complete-Reference.pdf</code></td></tr>
+        <tr><td style="color:var(--muted)">This page</td><td><code>docs/offline-dashboard.html</code></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px">Generated / Runtime</div>
+      <table class="cmd-table" style="font-size:12px">
+        <tr><td style="color:var(--muted);width:48%">Offline cache</td><td><code>~/sap-ai-assistant/cdd-cache/</code></td></tr>
+        <tr><td style="color:var(--muted)">Cache index</td><td><code>~/sap-ai-assistant/cdd-cache/index.json</code></td></tr>
+        <tr><td style="color:var(--muted)">Crawled objects</td><td><code>knowledge/abap/{type}/*.json</code></td></tr>
+        <tr><td style="color:var(--muted)">Crawl progress</td><td><code>knowledge/crawl/manifest.json</code></td></tr>
+        <tr><td style="color:var(--muted)">Dependency graph</td><td><code>knowledge/graph/</code></td></tr>
+        <tr><td style="color:var(--muted)">AI system prompt</td><td><code>knowledge/exports/cdd-system-prompt.md</code></td></tr>
+        <tr><td style="color:var(--muted)">Tool output</td><td><code>/tmp/sap-mcp/{system}_{client}/</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- CDD domain knowledge -->
+  <div class="sec-title">CDD / NCDD Domain Quick Reference</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">CDD v1 — /HEC1/CP_CDD (BOPF)</div>
+      <table class="cmd-table" style="font-size:12px; margin-top:10px">
+        <tr><td style="color:var(--muted);width:50%">Entry point</td><td><code>CL_CDD_MANAGER.get_instance()</code></td></tr>
+        <tr><td style="color:var(--muted)">Notifications</td><td><code>CL_CDD_EMAIL.EVENT_CDD(event_id)</code></td></tr>
+        <tr><td style="color:var(--muted)">Feature toggle</td><td><code>CL_PROV_UTILITY.is_feature_enabled()</code></td></tr>
+        <tr><td style="color:var(--muted)">Config table</td><td><code>/HEC1/CDD_CUSTOM</code></td></tr>
+        <tr><td style="color:var(--muted)">Audit log</td><td><code>/HEC1/CDD_ACTION</code></td></tr>
+        <tr><td style="color:var(--muted)">CR config</td><td><code>/HEC1/CDD_CR</code></td></tr>
+        <tr><td style="color:var(--muted)">BOPF mapping</td><td><code>/HEC1/CDDBOPFCNF</code></td></tr>
+        <tr><td style="color:var(--muted)">UI framework</td><td>Web Dynpro ABAP</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">CDD 2.0 — /HEC1/CP_NCDD (RAP)</div>
+      <table class="cmd-table" style="font-size:12px; margin-top:10px">
+        <tr><td style="color:var(--muted);width:50%">Entry point</td><td><code>BPCL_I_NCDD_WORKLIST</code></td></tr>
+        <tr><td style="color:var(--muted)">Automation</td><td><code>CL_NCDD_AUTO_FACTORY → IF_NCDD_AUTO_CALC</code></td></tr>
+        <tr><td style="color:var(--muted)">Calc config</td><td><code>/HEC1/NCDD_AUTO_S_CALC_CUST</code></td></tr>
+        <tr><td style="color:var(--muted)">Worklist BDEF</td><td><code>/HEC1/I_NCDD_WORKLIST</code></td></tr>
+        <tr><td style="color:var(--muted)">Consumption BDEF</td><td><code>/HEC1/C_NCDD_WORKLIST</code></td></tr>
+        <tr><td style="color:var(--muted)">Draft support</td><td>Yes (RAP managed)</td></tr>
+        <tr><td style="color:var(--muted)">UI framework</td><td>Fiori Elements (OData V4)</td></tr>
+        <tr><td style="color:var(--muted)">Notifications</td><td>CDS views + RAP events</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Troubleshoot -->
+  <div class="sec-title">Troubleshooting</div>
+  <div class="card" style="padding:0; overflow:hidden">
+    <table class="cmd-table">
+      <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Server not reachable / status shows Offline</td><td>Run <code>./start-sap-assistant.sh</code> in a terminal. Keep that terminal window open.</td></tr>
+        <tr><td>JAR not found error on start</td><td><code>cd jco-service &amp;&amp; mvn clean package</code>, then retry.</td></tr>
+        <tr><td>cdd_local_get_code returns empty / not found</td><td>Run <code>node sync-java-cache.js</code> from the pipeline/ folder after completing crawl phase 2.</td></tr>
+        <tr><td>Crawl interrupted — want to resume</td><td><code>node fix-manifest.js &amp;&amp; node cdd-crawler.js --phase 2 --concurrency 5</code></td></tr>
+        <tr><td>/cdd-knowledge returns "Run export-builder.js first"</td><td><code>node graph-builder.js &amp;&amp; node export-builder.js</code></td></tr>
+        <tr><td>POST /api/pipeline/reload-cache → 404</td><td>Rebuild JAR: <code>cd jco-service &amp;&amp; mvn clean package</code>, restart server.</td></tr>
+        <tr><td>JCo SNC error / cannot connect to ISD</td><td>Run <code>kinit</code> first to get a Kerberos ticket. Check SNC partner name in <code>.sap-systems.json</code>.</td></tr>
+        <tr><td>Port 8080 already in use</td><td>Use <code>./start-sap-assistant.sh --port 9090</code> and bookmark the new URL.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  SAP AI Assistant — Offline Dashboard &nbsp;·&nbsp; Bookmark this file:
+  <code>docs/offline-dashboard.html</code> &nbsp;·&nbsp;
+  Full reference: <a href="SAP-AI-Assistant-Complete-Reference.pdf" target="_blank">PDF</a>
+</footer>
+
+<script>
+// ── Server health check ───────────────────────────────────────────────────────
+async function checkServer() {
+  const dot    = document.getElementById('status-dot');
+  const txt    = document.getElementById('status-text');
+  const card   = document.getElementById('server-status-card');
+
+  try {
+    const res  = await fetch('http://localhost:8080/api/status', { signal: AbortSignal.timeout(3000) });
+    const data = await res.json();
+
+    dot.className = 'dot online';
+    txt.textContent = `${data.tools || 0} tools · ${data.model || 'ready'}`;
+
+    card.className = 'card infobox green';
+    card.innerHTML =
+      '✅ <strong>Server is running</strong> at ' +
+      '<a href="http://localhost:8080" target="_blank"><code>http://localhost:8080</code></a>. ' +
+      `${data.tools || ''} tools registered. ` +
+      '<a href="http://localhost:8080" target="_blank" ' +
+      'style="font-weight:600;color:var(--green);text-decoration:underline">Open AI Chat →</a>';
+
+  } catch (e) {
+    dot.className = 'dot offline';
+    txt.textContent = 'Server offline';
+
+    card.className = 'card infobox amber';
+    card.innerHTML =
+      '⚠️ <strong>Server not running.</strong> ' +
+      'Start it with: <code>cd ~/Desktop/sap-ai-assistant &amp;&amp; ./start-sap-assistant.sh</code> — ' +
+      'then refresh this page. The AI chat at <code>http://localhost:8080</code> will become available. ' +
+      '<br><br><strong>Note:</strong> All offline tools (cdd_local_search, cdd_local_get_code, this page) ' +
+      'work without the server.';
+  }
+}
+
+// ── Fiori dropdown ────────────────────────────────────────────────────────────
+function toggleFiori() {
+  document.getElementById('fioriMenu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('fioriWrap').contains(e.target)) {
+    document.getElementById('fioriMenu').classList.remove('open');
+  }
+});
+
+checkServer();
+setInterval(checkServer, 30000); // re-check every 30 s
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "systems": {
+    "dev": {
+      "url": "https://dev-sap.example.com:44300",
+      "client": "100",
+      "authType": "snc",
+      "snc": {
+        "partnername": "p/secude:CN=DEV, O=EXAMPLE, C=US",
+        "qop": 9
+      },
+      "description": "Development system"
+    },
+    "test": {
+      "url": "https://test-sap.example.com:44300",
+      "client": "200",
+      "authType": "snc",
+      "snc": {
+        "partnername": "p/secude:CN=TEST, O=EXAMPLE, C=US",
+        "qop": 9
+      },
+      "description": "Test/QA system"
+    },
+    "prod": {
+      "url": "https://prod-sap.example.com:44300",
+      "client": "300",
+      "authType": "snc",
+      "snc": {
+        "partnername": "p/secude:CN=PROD, O=EXAMPLE, C=US",
+        "qop": 9
+      },
+      "description": "Production system (read-only recommended)"
+    }
+  },
+  "default": "dev"
+}
