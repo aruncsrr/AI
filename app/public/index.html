@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP CDD Knowledge Base — Fiori</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   SAP Fiori Design System — Light Theme
+   Primary: #0070f2  Success: #107e3e  Error: #bb0000
+   Background: #f5f6f7  Surface: #ffffff  Text: #32363a
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --sap-blue:      #0070f2;
+  --sap-blue-dk:   #0050b3;
+  --sap-blue-lt:   #e8f1fd;
+  --sap-green:     #107e3e;
+  --sap-green-lt:  #e8f5ed;
+  --sap-red:       #bb0000;
+  --sap-red-lt:    #faeaea;
+  --sap-orange:    #e9730c;
+  --sap-purple:    #6c32a0;
+  --sap-teal:      #0e6868;
+  --bg:            #f5f6f7;
+  --surface:       #ffffff;
+  --surface2:      #f5f6f7;
+  --border:        #d9d9d9;
+  --border-lt:     #ebebeb;
+  --text:          #32363a;
+  --text2:         #6a6d70;
+  --text3:         #a5a5a5;
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.10);
+  --shadow-md:     0 2px 12px rgba(0,0,0,0.12);
+  --shell-bg:      #354a5e;
+  --radius:        8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: '72', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ─── SAP Shell Bar (top header, navy like Fiori) ────────────────── */
+/* This is the dark blue bar you see at the very top of every SAP app */
+.shell-bar {
+  background: var(--shell-bg);
+  color: #fff;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.shell-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #fff;
+  flex-shrink: 0;
+}
+.shell-logo-box {
+  background: #fff;
+  color: var(--sap-blue);
+  font-weight: 900;
+  font-size: 12px;
+  padding: 2px 5px;
+  border-radius: 2px;
+  letter-spacing: -0.5px;
+}
+.shell-product { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.shell-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+
+/* connection mode toggle — in shell bar */
+.mode-pill {
+  display: flex;
+  background: rgba(0,0,0,0.25);
+  border-radius: 20px;
+  padding: 2px;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  transition: all 0.2s;
+}
+.mode-btn.active { color: #fff; }
+.mode-btn.active.mode-offline { background: var(--sap-red); }
+.mode-btn.active.mode-online  { background: var(--sap-green); }
+.mode-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mode-btn.mode-offline .mode-dot { background: #ff6b6b; }
+.mode-btn.mode-online  .mode-dot { background: #4caf50; }
+.mode-btn.active.mode-offline .mode-dot { background: #ffaaaa; }
+.mode-btn.active.mode-online  .mode-dot { background: #a5d6a7; }
+
+.shell-search-wrap {
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+}
+.shell-search {
+  width: 100%;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 6px 16px 6px 36px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: background 0.2s;
+}
+.shell-search::placeholder { color: rgba(255,255,255,0.55); }
+.shell-search:focus { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.5); }
+.shell-search-icon {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6; pointer-events: none;
+}
+
+.shell-actions { display: flex; gap: 6px; margin-left: auto; flex-shrink: 0; }
+.shell-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  padding: 5px 10px;
+  color: rgba(255,255,255,0.9);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.shell-btn:hover { background: rgba(255,255,255,0.25); }
+.shell-btn.active { background: var(--sap-blue); border-color: var(--sap-blue); }
+
+.shell-status {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Page tabs (like Fiori object page navigation) ────────────────── */
+.page-tabs {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border-lt);
+  display: flex;
+  gap: 0;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 10px 18px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  white-space: nowrap;
+  transition: all 0.15s;
+  margin-bottom: -2px;
+}
+.tab-btn:hover { color: var(--text); background: var(--bg); }
+.tab-btn.active { color: var(--sap-blue); border-bottom-color: var(--sap-blue); font-weight: 600; }
+
+/* ─── Main layout ────────────────────────────────────────────────── */
+.app-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: calc(100vh - 44px - 43px); /* full height minus shell + tabs */
+}
+
+/* ─── Left navigation (like Fiori side navigation) ───────────────── */
+.side-nav {
+  background: var(--surface);
+  border-right: 1px solid var(--border-lt);
+  overflow-y: auto;
+  padding: 12px 0;
+}
+.side-nav-title {
+  padding: 4px 16px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  font-size: 13px;
+  color: var(--text2);
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active {
+  background: var(--sap-blue-lt);
+  border-left-color: var(--sap-blue);
+  color: var(--sap-blue);
+  font-weight: 600;
+}
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+.nav-item.active .nav-badge { background: #fff; border-color: var(--sap-blue-lt); color: var(--sap-blue); }
+
+/* ─── Main content area ──────────────────────────────────────────── */
+.main-content {
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg);
+}
+
+/* ─── Launchpad (home screen tiles, like Fiori Launchpad) ──────────── */
+/*
+  What is Fiori Launchpad?
+  It's the home screen of SAP Fiori apps. You see tiles (square cards)
+  arranged in groups, each tile opens a different app or function.
+  Think of it like an app store home screen for SAP.
+*/
+.launchpad { max-width: 1100px; }
+.launchpad-welcome {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  border-left: 4px solid var(--sap-blue);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.launchpad-welcome h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.launchpad-welcome p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.launchpad-welcome p strong { color: var(--sap-blue); }
+
+.tile-group-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin: 20px 0 10px;
+}
+.tile-group-label:first-of-type { margin-top: 0; }
+
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 8px; }
+
+/* A Fiori tile: square card with icon, title, optional KPI number */
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border-lt);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 100px;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.tile:hover { box-shadow: var(--shadow-md); border-color: var(--sap-blue); transform: translateY(-1px); }
+.tile:active { transform: translateY(0); }
+.tile-icon { font-size: 24px; line-height: 1; }
+.tile-title { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.tile-sub  { font-size: 11px; color: var(--text3); line-height: 1.3; }
+.tile-kpi  { font-size: 22px; font-weight: 700; color: var(--sap-blue); margin-top: auto; }
+.tile-strip {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px;
+}
+.tile-blue   .tile-strip { background: var(--sap-blue); }
+.tile-green  .tile-strip { background: var(--sap-green); }
+.tile-orange .tile-strip { background: var(--sap-orange); }
+.tile-purple .tile-strip { background: var(--sap-purple); }
+.tile-teal   .tile-strip { background: var(--sap-teal); }
+.tile-red    .tile-strip { background: var(--sap-red); }
+
+/* ─── Search results ─────────────────────────────────────────────── */
+.search-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.result-count {
+  font-size: 13px;
+  color: var(--text2);
+  padding: 4px 0;
+}
+.result-count strong { color: var(--text); }
+
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border-lt);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.result-card:hover { box-shadow: var(--shadow-md); border-color: var(--sap-blue); }
+.result-card.expanded { border-color: var(--sap-blue); }
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.card-cat-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.cat-processes    { background: #e8f1fd; color: var(--sap-blue); }
+.cat-bopf         { background: #f0eaf7; color: var(--sap-purple); }
+.cat-tables       { background: #e8f5ed; color: var(--sap-green); }
+.cat-patterns     { background: #fef3e8; color: var(--sap-orange); }
+.cat-wiki         { background: #e6f7f7; color: var(--sap-teal); }
+.cat-ddic         { background: #e8f5ed; color: var(--sap-teal); }
+.cat-domains      { background: #f0eaf7; color: var(--sap-purple); }
+.cat-authorization{ background: #faeaea; color: var(--sap-red); }
+.cat-integrations { background: #e8f1fd; color: var(--sap-blue); }
+.cat-messages     { background: #fef3e8; color: var(--sap-orange); }
+.cat-master-data  { background: #e6f7f7; color: var(--sap-teal); }
+.cat-exports      { background: #f5f6f7; color: #6a6d70; }
+
+.card-info { flex: 1; min-width: 0; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.card-path  { font-size: 11px; color: var(--text3); font-family: monospace; margin-bottom: 4px; }
+.card-preview { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.card-score-box { flex-shrink: 0; text-align: center; padding: 6px 10px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border-lt); }
+.score-num { font-size: 15px; font-weight: 700; color: var(--sap-blue); display: block; }
+.score-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.sap-ids { padding: 0 16px 10px; display: flex; flex-wrap: wrap; gap: 4px; }
+.sap-id {
+  font-size: 10px; font-family: monospace;
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--sap-blue); padding: 2px 7px; border-radius: 3px;
+  cursor: pointer; transition: background 0.1s;
+}
+.sap-id:hover { background: var(--sap-blue-lt); }
+
+.card-expand {
+  border-top: 1px solid var(--border-lt);
+  background: #fafafa;
+}
+.card-sections { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.section-item { border-left: 2px solid var(--sap-blue-lt); padding-left: 10px; }
+.section-heading { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.section-snippet { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.card-actions { padding: 8px 16px 12px; display: flex; gap: 8px; }
+.card-full-content {
+  margin: 0 16px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border-lt);
+  border-radius: 6px;
+  padding: 14px;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ─── Buttons ─────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  border: none; border-radius: 6px; cursor: pointer;
+  font-size: 13px; font-weight: 600; padding: 7px 14px;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-primary { background: var(--sap-blue); color: #fff; }
+.btn-primary:hover { background: var(--sap-blue-dk); }
+.btn-ghost {
+  background: var(--surface); color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--sap-blue); color: var(--sap-blue); background: var(--sap-blue-lt); }
+.btn-sm { font-size: 12px; padding: 5px 10px; }
+
+/* ─── Spinners & states ───────────────────────────────────────────── */
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--sap-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 40px auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+.empty-state h3 { font-size: 16px; color: var(--text); margin-bottom: 8px; }
+.empty-state p  { font-size: 13px; }
+.error-box {
+  background: var(--sap-red-lt); border: 1px solid #f4b8b8;
+  border-radius: var(--radius); padding: 14px 16px;
+  color: var(--sap-red); font-size: 13px;
+}
+.info-box {
+  background: var(--sap-blue-lt); border: 1px solid #b8d4f8;
+  border-radius: var(--radius); padding: 12px 16px;
+  color: var(--sap-blue); font-size: 13px;
+}
+.success-box {
+  background: var(--sap-green-lt); border: 1px solid #b8dfc5;
+  border-radius: var(--radius); padding: 12px 16px;
+  color: var(--sap-green); font-size: 13px;
+}
+
+/* ─── Online result cards ─────────────────────────────────────────── */
+.online-card {
+  background: var(--surface); border: 1px solid var(--border-lt);
+  border-radius: var(--radius); padding: 14px 16px;
+  box-shadow: var(--shadow-sm); display: flex; gap: 12px; align-items: flex-start;
+}
+.obj-type-badge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  padding: 3px 7px; border-radius: 3px;
+  background: var(--sap-blue-lt); color: var(--sap-blue); flex-shrink: 0;
+}
+.obj-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.obj-desc { font-size: 12px; color: var(--text2); }
+.obj-pkg  { font-size: 11px; color: var(--text3); font-family: monospace; margin-top: 2px; }
+
+/* ─── Hierarchy tree ─────────────────────────────────────────────── */
+.tree-wrap { max-width: 900px; }
+.tree-dir {
+  margin-bottom: 16px; background: var(--surface);
+  border: 1px solid var(--border-lt); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.tree-dir-header {
+  padding: 10px 16px; background: var(--bg);
+  border-bottom: 1px solid var(--border-lt);
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text3);
+}
+.tree-file {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; cursor: pointer;
+  border-bottom: 1px solid var(--border-lt); transition: background 0.12s;
+}
+.tree-file:last-child { border-bottom: none; }
+.tree-file:hover { background: var(--sap-blue-lt); }
+.tree-file-name { font-size: 13px; color: var(--text); font-weight: 500; }
+.tree-file-size { margin-left: auto; font-size: 11px; color: var(--text3); }
+
+/* ─── Analyzer panel ─────────────────────────────────────────────── */
+.overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(50,54,58,0.5); z-index: 400; display: none;
+  overflow-y: auto;
+}
+.overlay.open { display: block; }
+.dialog {
+  background: var(--surface); border-radius: 10px;
+  max-width: 760px; margin: 48px auto 48px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2); overflow: hidden;
+}
+.dialog-header {
+  background: var(--sap-blue); color: #fff;
+  padding: 16px 20px; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.dialog-header h3 { font-size: 15px; font-weight: 600; }
+.dialog-close { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; font-size: 20px; line-height: 1; }
+.dialog-body { padding: 20px; }
+.dialog-body textarea {
+  width: 100%; min-height: 90px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px;
+  color: var(--text); font-size: 13px;
+  resize: vertical; outline: none; font-family: inherit; line-height: 1.5;
+}
+.dialog-body textarea:focus { border-color: var(--sap-blue); }
+.analyzer-out {
+  margin-top: 16px; background: var(--bg); border: 1px solid var(--border-lt);
+  border-radius: 6px; padding: 16px; font-size: 12.5px;
+  line-height: 1.7; color: var(--text); max-height: 50vh; overflow-y: auto;
+  white-space: pre-wrap; font-family: 'Courier New', Courier, monospace;
+}
+.analyzer-sources { margin-top: 12px; }
+.src-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border-lt);
+  font-size: 12px;
+}
+.src-item:last-child { border-bottom: none; }
+.src-title { color: var(--sap-blue); cursor: pointer; font-weight: 500; flex: 1; }
+.src-title:hover { text-decoration: underline; }
+.src-path { color: var(--text3); font-family: monospace; font-size: 11px; }
+.src-score { font-size: 11px; color: var(--sap-green); font-weight: 600; flex-shrink: 0; }
+
+/* ─── Chat Bot ───────────────────────────────────────────────────────
+   Think of this as a WhatsApp/Teams chat window, but for asking
+   questions about the SAP codebase. You type a question, it searches
+   the knowledge base and replies with relevant information.
+*/
+.chat-fab {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--sap-blue); color: #fff;
+  border: none; cursor: pointer; font-size: 22px;
+  box-shadow: 0 4px 16px rgba(0,112,242,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,112,242,0.5); }
+.chat-fab-label {
+  position: absolute; bottom: 60px; right: 0;
+  background: var(--text); color: #fff;
+  font-size: 11px; padding: 4px 8px; border-radius: 4px;
+  white-space: nowrap; opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.chat-fab:hover .chat-fab-label { opacity: 1; }
+
+.chat-window {
+  position: fixed; bottom: 90px; right: 24px; z-index: 300;
+  width: 380px; height: 520px;
+  background: var(--surface); border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  border: 1px solid var(--border);
+  display: none; flex-direction: column; overflow: hidden;
+}
+.chat-window.open { display: flex; }
+
+.chat-header {
+  background: var(--sap-blue); color: #fff;
+  padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.chat-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.chat-header-info { flex: 1; }
+.chat-header-name { font-size: 13px; font-weight: 600; }
+.chat-header-status { font-size: 11px; opacity: 0.8; display: flex; align-items: center; gap: 4px; }
+.chat-header-status::before { content:''; width:6px; height:6px; border-radius:50%; background:#4caf50; display:inline-block; }
+.chat-close { background: none; border: none; color: rgba(255,255,255,0.8); cursor: pointer; font-size: 18px; }
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  background: #f9f9f9;
+}
+
+/* Message bubbles — like WhatsApp/Teams */
+.msg { max-width: 85%; display: flex; flex-direction: column; gap: 2px; }
+.msg.bot  { align-self: flex-start; }
+.msg.user { align-self: flex-end; }
+.msg-bubble {
+  padding: 9px 12px; border-radius: 12px;
+  font-size: 13px; line-height: 1.55;
+  word-break: break-word;
+}
+.msg.bot  .msg-bubble { background: #fff; border: 1px solid var(--border-lt); border-bottom-left-radius: 3px; color: var(--text); }
+.msg.user .msg-bubble { background: var(--sap-blue); color: #fff; border-bottom-right-radius: 3px; }
+.msg-time { font-size: 10px; color: var(--text3); }
+.msg.user .msg-time { text-align: right; }
+.msg-bubble code { background: rgba(0,0,0,0.07); padding: 1px 4px; border-radius: 3px; font-size: 11px; font-family: monospace; }
+.msg.user .msg-bubble code { background: rgba(255,255,255,0.2); }
+.msg-bubble .src-link {
+  display: inline-block; margin-top: 4px; padding: 3px 8px;
+  background: var(--sap-blue-lt); color: var(--sap-blue);
+  border-radius: 4px; font-size: 11px; cursor: pointer;
+  border: 1px solid #c5d9f5;
+}
+.msg-bubble .src-link:hover { background: #d0e6fb; }
+.chat-typing {
+  align-self: flex-start; background: #fff; border: 1px solid var(--border-lt);
+  border-radius: 12px; border-bottom-left-radius: 3px;
+  padding: 10px 14px; display: none; gap: 4px; align-items: center;
+}
+.chat-typing.show { display: flex; }
+.typing-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--text3);
+  animation: bounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+/* Suggested questions chips */
+.chat-suggestions { padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; border-top: 1px solid var(--border-lt); background: var(--surface); }
+.suggest-chip {
+  font-size: 11px; padding: 4px 10px; border-radius: 14px;
+  border: 1px solid var(--border); background: var(--bg);
+  cursor: pointer; color: var(--text2); transition: all 0.12s;
+  white-space: nowrap;
+}
+.suggest-chip:hover { border-color: var(--sap-blue); color: var(--sap-blue); background: var(--sap-blue-lt); }
+
+.chat-input-row {
+  padding: 10px 12px; border-top: 1px solid var(--border-lt);
+  display: flex; gap: 8px; flex-shrink: 0; background: var(--surface);
+}
+.chat-input {
+  flex: 1; border: 1px solid var(--border); border-radius: 20px;
+  padding: 8px 14px; font-size: 13px; outline: none; color: var(--text);
+  font-family: inherit; resize: none; overflow: hidden; height: 36px;
+  transition: border-color 0.15s; background: var(--bg);
+}
+.chat-input:focus { border-color: var(--sap-blue); }
+.chat-send {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--sap-blue); color: #fff;
+  border: none; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.chat-send:hover { background: var(--sap-blue-dk); }
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .app-layout { grid-template-columns: 1fr; }
+  .side-nav { display: none; }
+  .chat-window { width: calc(100vw - 32px); right: 16px; }
+  .shell-status { display: none; }
+  .shell-actions .shell-btn:nth-child(n+3) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SAP SHELL BAR
+     This is the dark navy bar at the top — every SAP Fiori app
+     has one. It shows the app name, search, and navigation.
+     ═══════════════════════════════════════════════════════════════ -->
+<header class="shell-bar">
+
+  <!-- SAP logo + product name -->
+  <a class="shell-logo" href="#" onclick="showLaunchpad();return false;">
+    <span class="shell-logo-box">SAP</span>
+    <span class="shell-product">CDD Knowledge Base</span>
+  </a>
+
+  <span class="shell-divider"></span>
+
+  <!-- Connection mode: Offline (red) = local data, Online (green) = live SAP -->
+  <div class="mode-pill" title="Offline uses local knowledge files. Online queries the live SAP ISD system.">
+    <button class="mode-btn mode-offline active" onclick="setMode('offline')" title="Use local knowledge base — works without SAP connection">
+      <span class="mode-dot"></span> Offline
+    </button>
+    <button class="mode-btn mode-online" onclick="setMode('online')" title="Query live SAP ISD system — requires network + MCP server">
+      <span class="mode-dot"></span> Online
+    </button>
+  </div>
+
+  <span class="shell-divider"></span>
+
+  <!-- Universal search box -->
+  <div class="shell-search-wrap">
+    <svg class="shell-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="searchInput" class="shell-search" type="text"
+      placeholder="Search knowledge base…"
+      autocomplete="off"
+      oninput="onSearchInput()"
+      onkeydown="if(event.key==='Enter') doSearch()"/>
+  </div>
+
+  <!-- Action buttons on the right of the shell -->
+  <div class="shell-actions">
+    <button class="shell-btn" onclick="switchTab('hierarchy')" title="Browse all knowledge files in a tree view">🗂 Files</button>
+    <button class="shell-btn" onclick="openAnalyzer()" title="Analyze a new feature requirement — finds which files/tables/classes are relevant">🔍 Analyze</button>
+    <button class="shell-btn" onclick="exportPDF()" title="Export all knowledge to PDF for offline reading">📄 PDF</button>
+    <button class="shell-btn" onclick="switchTab('launchpad')" title="Go to home screen">🏠 Home</button>
+  </div>
+
+  <span class="shell-divider"></span>
+  <span class="shell-status" id="statusBadge">Loading…</span>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE TABS
+     Like the tab bar in a browser — each tab shows a different view:
+     Home, Search Results, File Browser, etc.
+     ═══════════════════════════════════════════════════════════════ -->
+<nav class="page-tabs" id="pageTabs">
+  <button class="tab-btn active" data-tab="launchpad"   onclick="switchTab('launchpad')">🏠 Home</button>
+  <button class="tab-btn"        data-tab="search"      onclick="switchTab('search')">🔍 Search</button>
+  <button class="tab-btn"        data-tab="hierarchy"   onclick="switchTab('hierarchy')">🗂 Knowledge Files</button>
+  <button class="tab-btn"        data-tab="patterns"    onclick="switchTab('patterns')">🧩 Dev Patterns</button>
+  <button class="tab-btn"        data-tab="bopf"        onclick="switchTab('bopf')">🔷 BOPF Guide</button>
+  <button class="tab-btn"        data-tab="business"    onclick="switchTab('business')">📋 Business Terms</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN APP LAYOUT
+     Left: navigation sidebar (category filter)
+     Right: main content area (changes based on active tab)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="app-layout">
+
+  <!-- Left navigation panel -->
+  <nav class="side-nav">
+    <div class="side-nav-title">Knowledge Areas</div>
+    <div id="sideNavItems"><!-- filled by JS --></div>
+  </nav>
+
+  <!-- Main content — everything is rendered here by JavaScript -->
+  <main class="main-content" id="mainContent">
+    <div class="spinner"></div>
+  </main>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FEATURE ANALYZER DIALOG
+     A popup window where you describe a new feature requirement
+     (e.g. "Add rejection categories") and the app finds which
+     tables, classes, and files you need to change.
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="overlay" id="analyzerOverlay" onclick="if(event.target===this) closeAnalyzer()">
+  <div class="dialog">
+    <div class="dialog-header">
+      <h3>🔍 Feature Impact Analyzer</h3>
+      <button class="dialog-close" onclick="closeAnalyzer()">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6">
+        <strong>What is this?</strong> Describe a new feature or change you want to build.
+        The analyzer searches the knowledge base and tells you which ABAP classes, database tables,
+        and CDS views are involved, plus step-by-step implementation guidance.
+      </p>
+      <textarea id="analyzerInput"
+        placeholder="Example: Add new rejection categories for CDD at item and header level, including reasons like 'Hardware Unavailable' and 'Technical infeasibility'…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="runAnalysis()">▶ Analyze Requirement</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('analyzerInput').value='Add new rejection categories for CDD at item and header level'">📋 Use Example</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('analyzerInput').value='Add a new status after approval for provisioning handover tracking'">📋 Another Example</button>
+      </div>
+      <div id="analyzerResult"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAT BOT WINDOW
+     A floating chat window (like Teams or WhatsApp) where you can
+     ask questions in plain English about the SAP codebase.
+     The bot searches the local knowledge base and replies with
+     relevant information, code references, and explanations.
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- The round blue button that opens/closes the chat -->
+<button class="chat-fab" onclick="toggleChat()" title="Ask a question about the SAP codebase">
+  <span id="chatFabIcon">💬</span>
+</button>
+
+<!-- The chat window itself (hidden until you click the button) -->
+<div class="chat-window" id="chatWindow">
+
+  <!-- Chat header — shows bot name and online status -->
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">CDD Knowledge Assistant</div>
+      <div class="chat-header-status">Always available — local knowledge base</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+
+  <!-- Messages appear here — bot messages on left, your messages on right -->
+  <div class="chat-messages" id="chatMessages"></div>
+
+  <!-- Typing indicator (three bouncing dots) — shows while bot is "thinking" -->
+  <div class="chat-typing" id="chatTyping">
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+    <span class="typing-dot"></span>
+  </div>
+
+  <!-- Quick question chips — tap to ask without typing -->
+  <div class="chat-suggestions" id="chatSuggestions">
+    <span class="suggest-chip" onclick="askBot('What is the CDD approval flow?')">CDD approval flow</span>
+    <span class="suggest-chip" onclick="askBot('What BOPF nodes exist?')">BOPF nodes</span>
+    <span class="suggest-chip" onclick="askBot('What is W@R scenario?')">W@R scenario</span>
+    <span class="suggest-chip" onclick="askBot('How does auto approval work?')">Auto approval</span>
+    <span class="suggest-chip" onclick="askBot('Which tables store CDD data?')">CDD tables</span>
+    <span class="suggest-chip" onclick="askBot('Explain Phase Shift')">Phase Shift</span>
+  </div>
+
+  <!-- Text input + send button -->
+  <div class="chat-input-row">
+    <input id="chatInput" class="chat-input" type="text"
+      placeholder="Ask anything about the SAP codebase…"
+      onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendChat(); }"/>
+    <button class="chat-send" onclick="sendChat()" title="Send">➤</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT — The "brain" of the application
+     Written in plain JavaScript (no external libraries needed).
+     Everything below runs in your browser — no server needed
+     for offline search and chat.
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── App State ─────────────────────────────────────────────────────────────
+// Think of "state" as variables that remember what the user is doing.
+let mode          = 'offline';   // which mode: 'offline' or 'online'
+let searchIndex   = null;        // the pre-built search index loaded from JSON
+let allDocs       = [];          // array of all knowledge documents
+let activeCategory = null;       // which category filter is selected
+let activeTab     = 'launchpad'; // which page tab is currently shown
+let searchTimer   = null;        // debounce timer for search input
+
+// ─── BM25 Search (client-side) ─────────────────────────────────────────────
+// BM25 is a ranking algorithm — it scores documents by relevance to a query.
+// "client-side" means it runs in the browser using the pre-built index.
+const STOP_WORDS = new Set(['a','an','the','and','or','but','in','on','at','to','for',
+  'of','with','by','from','is','it','its','be','was','are','were','has','have','had',
+  'that','this','these','those','as','do','not','all','can','will','would','also',
+  'than','then','when','where','which','who','how','what','if','into','each','so',
+  'use','used','using','more','one','two','may','per','any']);
+
+function tokenize(text) {
+  return text.toLowerCase().replace(/[^a-z0-9\/_-]/g,' ')
+    .split(/\s+/).filter(t => t.length >= 2 && !STOP_WORDS.has(t));
+}
+
+function bm25Search(query, docs, index, topK = 15) {
+  const tokens = tokenize(query);
+  const terms  = [...tokens];
+  // Add bigrams: "bopf node" becomes both "bopf" AND "bopf node" for better matching
+  for (let i = 0; i < tokens.length - 1; i++) terms.push(tokens[i] + ' ' + tokens[i+1]);
+  const scores = {};
+  for (const term of terms) {
+    for (const { id, score } of (index[term] || [])) {
+      scores[id] = (scores[id] || 0) + score;
+    }
+  }
+  return Object.entries(scores)
+    .sort((a, b) => b[1] - a[1]).slice(0, topK)
+    .map(([id, score]) => ({ ...docs[parseInt(id)], score: Math.round(score * 100) / 100 }));
+}
+
+// ─── Startup ───────────────────────────────────────────────────────────────
+// This runs when the page first loads. It fetches the search index
+// and sets up the initial screen.
+async function init() {
+  try {
+    const resp = await fetch('/search-index.json');
+    if (!resp.ok) throw new Error('Index file missing');
+    searchIndex = await resp.json();
+    allDocs = searchIndex.docs;
+    document.getElementById('statusBadge').textContent =
+      `${searchIndex.meta.docCount} docs · ${searchIndex.meta.termCount.toLocaleString()} terms`;
+    renderSideNav();
+    renderLaunchpad();
+    initChat();
+  } catch (e) {
+    document.getElementById('statusBadge').textContent = '⚠ Index error';
+    document.getElementById('mainContent').innerHTML =
+      `<div class="error-box" style="max-width:500px">
+        <strong>Search index not found.</strong><br>
+        Run this command in your terminal:<br>
+        <code style="display:block;margin-top:6px;padding:6px;background:rgba(0,0,0,0.07);border-radius:4px">
+          node pipeline/build-search-index.js
+        </code>
+      </div>`;
+  }
+}
+
+// ─── Side Navigation ───────────────────────────────────────────────────────
+function renderSideNav() {
+  // Count how many documents are in each category
+  const cats = {};
+  for (const doc of allDocs) cats[doc.category] = (cats[doc.category] || 0) + 1;
+
+  const META = {
+    processes:     { icon: '⚙️',  label: 'Business Processes' },
+    bopf:          { icon: '🔷',  label: 'BOPF' },
+    tables:        { icon: '📊',  label: 'Tables & CDS' },
+    patterns:      { icon: '🧩',  label: 'Dev Patterns' },
+    wiki:          { icon: '📖',  label: 'Wiki Knowledge' },
+    ddic:          { icon: '🗄️',  label: 'DDIC Structures' },
+    domains:       { icon: '🔤',  label: 'Domain Values' },
+    authorization: { icon: '🔐',  label: 'Authorization' },
+    integrations:  { icon: '🔗',  label: 'Integrations' },
+    messages:      { icon: '💬',  label: 'Messages' },
+    'master-data': { icon: '📋',  label: 'Master Data' },
+    exports:       { icon: '📦',  label: 'Exports' },
+  };
+
+  let html = `
+    <a class="nav-item ${activeCategory === null ? 'active' : ''}"
+       onclick="filterCategory(null);switchTab('search')" href="#">
+      🔍 All Documents <span class="nav-badge">${allDocs.length}</span>
+    </a>`;
+
+  for (const [cat, cnt] of Object.entries(cats).sort((a,b) => b[1]-a[1])) {
+    const m = META[cat] || { icon: '📁', label: cat };
+    html += `
+      <a class="nav-item ${activeCategory === cat ? 'active' : ''}"
+         onclick="filterCategory('${cat}');switchTab('search')" href="#">
+        ${m.icon} ${m.label} <span class="nav-badge">${cnt}</span>
+      </a>`;
+  }
+  document.getElementById('sideNavItems').innerHTML = html;
+}
+
+// ─── Tab Switching ─────────────────────────────────────────────────────────
+// Each "tab" shows a different page. This function switches between them.
+function switchTab(tab) {
+  activeTab = tab;
+  // Update tab button styles
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+
+  switch (tab) {
+    case 'launchpad':  renderLaunchpad(); break;
+    case 'search':     doSearch(); break;
+    case 'hierarchy':  renderHierarchy(); break;
+    case 'patterns':   loadKnowledgeFile('knowledge/patterns/factory-classes.md', 'Development Patterns'); break;
+    case 'bopf':       loadKnowledgeFile('knowledge/bopf/bopf-nodes-complete.md', 'BOPF Node Reference'); break;
+    case 'business':   loadKnowledgeFile('knowledge/patterns/business-terms.md', 'Business Terms'); break;
+  }
+}
+
+// ─── Launchpad (Home Screen) ───────────────────────────────────────────────
+// The launchpad is like the home screen of your phone.
+// Each tile opens a different view or search.
+function renderLaunchpad() {
+  const meta = searchIndex ? searchIndex.meta : {};
+  const cats = {};
+  for (const doc of allDocs) cats[doc.category] = (cats[doc.category] || 0) + 1;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="launchpad">
+
+      <!-- Welcome banner -->
+      <div class="launchpad-welcome">
+        <h2>👋 Welcome to the SAP CDD Knowledge Base</h2>
+        <p>
+          This is your <strong>offline-first knowledge hub</strong> for the
+          <strong>CDD / NCDD / BOPF / Provisioning</strong> development area.<br>
+          Use it to understand the system, look up business terms, find which classes to modify,
+          or ask the chat bot any question — all without needing SAP access.
+        </p>
+      </div>
+
+      <!-- KPI tiles — show key numbers at a glance -->
+      <div class="tile-group-label">📊 Knowledge Base Overview</div>
+      <div class="tile-grid">
+        <div class="tile tile-blue" onclick="switchTab('search')">
+          <span class="tile-icon">📚</span>
+          <span class="tile-title">Knowledge Files</span>
+          <span class="tile-kpi">${allDocs.length}</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-teal" onclick="switchTab('search')">
+          <span class="tile-icon">🔤</span>
+          <span class="tile-title">Search Terms</span>
+          <span class="tile-kpi">${meta.termCount ? (meta.termCount/1000).toFixed(1)+'K' : '—'}</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-green" onclick="filterCategory('bopf');switchTab('search')">
+          <span class="tile-icon">🔷</span>
+          <span class="tile-title">BOPF Nodes</span>
+          <span class="tile-kpi">71</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-orange" onclick="filterCategory('tables');switchTab('search')">
+          <span class="tile-icon">📊</span>
+          <span class="tile-title">DB Tables</span>
+          <span class="tile-kpi">40+</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-purple" onclick="filterCategory('patterns');switchTab('search')">
+          <span class="tile-icon">🧩</span>
+          <span class="tile-title">Dev Patterns</span>
+          <span class="tile-kpi">${cats['patterns'] || 0}</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-red" onclick="loadKnowledgeFile('knowledge/processes/configurator-cdd-provisioning-flow.md','Process Flow')">
+          <span class="tile-icon">⚙️</span>
+          <span class="tile-title">CDD Status Codes</span>
+          <span class="tile-kpi">14</span>
+          <span class="tile-strip"></span>
+        </div>
+      </div>
+
+      <!-- Quick-access tiles for key topics -->
+      <div class="tile-group-label">🚀 Quick Access — Business Processes</div>
+      <div class="tile-grid">
+        <div class="tile tile-blue" onclick="loadKnowledgeFile('knowledge/processes/configurator-cdd-provisioning-flow.md','E2E Process Flow')">
+          <span class="tile-icon">🔄</span>
+          <span class="tile-title">E2E Process Flow</span>
+          <span class="tile-sub">Config → CDD → Provisioning</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-orange" onclick="loadKnowledgeFile('knowledge/processes/bopf-update-from-cdd.md','BOPF Update Flow')">
+          <span class="tile-icon">⚡</span>
+          <span class="tile-title">BOPF Update Flow</span>
+          <span class="tile-sub">CL_CDD_BOPF_UPDATE internals</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-teal" onclick="loadKnowledgeFile('knowledge/processes/cdd-constants-reference.md','CDD Constants')">
+          <span class="tile-icon">📋</span>
+          <span class="tile-title">CDD Constants</span>
+          <span class="tile-sub">Status codes, request types</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-purple" onclick="loadKnowledgeFile('knowledge/patterns/business-terms.md','Business Terms')">
+          <span class="tile-icon">📖</span>
+          <span class="tile-title">Business Terms</span>
+          <span class="tile-sub">Phase Shift, W@R, DR, Substitution</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-green" onclick="askBot('What is the CDD approval flow?');toggleChat()">
+          <span class="tile-icon">💬</span>
+          <span class="tile-title">Ask the Bot</span>
+          <span class="tile-sub">Chat about approval flow</span>
+          <span class="tile-strip"></span>
+        </div>
+      </div>
+
+      <!-- Developer tools tiles -->
+      <div class="tile-group-label">👨‍💻 Developer Tools</div>
+      <div class="tile-grid">
+        <div class="tile tile-blue" onclick="loadKnowledgeFile('knowledge/bopf/bopf-nodes-complete.md','BOPF Node Reference')">
+          <span class="tile-icon">🔷</span>
+          <span class="tile-title">BOPF Node Reference</span>
+          <span class="tile-sub">71 nodes, 5 BOs, DB tables</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-teal" onclick="loadKnowledgeFile('knowledge/patterns/factory-classes.md','Factory Classes')">
+          <span class="tile-icon">🏭</span>
+          <span class="tile-title">Factory Classes</span>
+          <span class="tile-sub">Singleton patterns, dispatch table</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-orange" onclick="loadKnowledgeFile('knowledge/tables/table-data-relationships.md','Table Relationships')">
+          <span class="tile-icon">🗄️</span>
+          <span class="tile-title">Table Relationships</span>
+          <span class="tile-sub">Row counts, ER diagram, keys</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-purple" onclick="loadKnowledgeFile('knowledge/tables/cds-views-ncdd-provisioning.md','CDS Views')">
+          <span class="tile-icon">👁</span>
+          <span class="tile-title">CDS Views</span>
+          <span class="tile-sub">NCDD 51 views, Prov 36 views</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-red" onclick="loadKnowledgeFile('knowledge/tables/abap-reports.md','ABAP Reports')">
+          <span class="tile-icon">⚡</span>
+          <span class="tile-title">ABAP Reports</span>
+          <span class="tile-sub">40 programs, batch jobs, emergency</span>
+          <span class="tile-strip"></span>
+        </div>
+        <div class="tile tile-green" onclick="openAnalyzer()">
+          <span class="tile-icon">🔍</span>
+          <span class="tile-title">Feature Analyzer</span>
+          <span class="tile-sub">Find impact of new features</span>
+          <span class="tile-strip"></span>
+        </div>
+      </div>
+
+      <!-- For new team members — beginner guide -->
+      <div class="tile-group-label">🎓 New to the Project? Start Here</div>
+      <div style="background:var(--surface);border:1px solid var(--border-lt);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);max-width:700px">
+        <p style="font-size:13px;line-height:1.8;color:var(--text2)">
+          <strong style="color:var(--text)">What is this system?</strong><br>
+          This is the SAP CDD (Change Delivery Date) system — a business process tool used by
+          the HEC team to manage change requests for hardware and software deliveries.
+          <br><br>
+          <strong style="color:var(--text)">Key concepts to learn first:</strong><br>
+          🔷 <strong>BOPF</strong> — Business Object Processing Framework. SAP's way of building business objects with nodes, actions, and validations.<br>
+          📋 <strong>CDD</strong> — Change Delivery Date request. Customers request to move delivery dates.<br>
+          🔄 <strong>NCDD</strong> — New CDD (version 2.0 using modern RAP technology).<br>
+          ⚙️ <strong>Provisioning</strong> — The process of actually setting up hardware/software after CDD approval.<br>
+          <br>
+          <strong style="color:var(--text)">How to use this tool:</strong><br>
+          1. Use the <strong>Search</strong> bar to find information about any class, table, or business term<br>
+          2. Click the <strong>💬 chat button</strong> to ask questions in plain language<br>
+          3. Use <strong>🔍 Analyze</strong> to get implementation guidance for new features<br>
+          4. Browse <strong>🗂 Knowledge Files</strong> to read full documentation
+        </p>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="askBot('I am new to this project, what should I know first?');toggleChat()">Ask the bot to guide me</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadKnowledgeFile('knowledge/processes/configurator-cdd-provisioning-flow.md','E2E Process Flow')">Read the E2E Process</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadKnowledgeFile('knowledge/patterns/business-terms.md','Business Terms')">Learn Business Terms</button>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+// ─── Category filter ───────────────────────────────────────────────────────
+function filterCategory(cat) {
+  activeCategory = cat;
+  renderSideNav();
+  const query = document.getElementById('searchInput').value.trim();
+  if (query) {
+    doSearch();
+  } else {
+    const filtered = cat ? allDocs.filter(d => d.category === cat) : allDocs;
+    renderResults(filtered.map(d => ({ ...d, score: null })), null);
+  }
+}
+
+// ─── Search ────────────────────────────────────────────────────────────────
+function onSearchInput() {
+  clearTimeout(searchTimer);
+  // Switch to search tab as soon as user starts typing
+  if (activeTab !== 'search') switchTab('search');
+  searchTimer = setTimeout(doSearch, 260);
+}
+
+async function doSearch() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (!query) {
+    if (activeTab === 'search') {
+      const filtered = activeCategory ? allDocs.filter(d => d.category === activeCategory) : allDocs;
+      renderResults(filtered.map(d => ({ ...d, score: null })), null);
+    }
+    return;
+  }
+  if (activeTab === 'launchpad') switchTab('search');
+
+  if (mode === 'offline') {
+    if (!searchIndex) return;
+    const pool = activeCategory ? allDocs.filter(d => d.category === activeCategory) : allDocs;
+    renderResults(bm25Search(query, pool, searchIndex.index), query);
+  } else {
+    showLoading();
+    try {
+      const resp = await fetch('/api/search/online', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      renderOnlineResults(await resp.json(), query);
+    } catch (e) {
+      showError('SAP live search failed: ' + e.message);
+    }
+  }
+}
+
+// ─── Mode toggle ───────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.classList.contains('mode-' + m));
+  });
+  document.getElementById('searchInput').placeholder =
+    m === 'offline' ? 'Search knowledge base…' : 'Search live SAP ISD system…';
+  const query = document.getElementById('searchInput').value.trim();
+  if (query) doSearch();
+}
+
+// ─── Result rendering ──────────────────────────────────────────────────────
+function renderResults(results, query) {
+  const main = document.getElementById('mainContent');
+  if (!results.length) {
+    main.innerHTML = `<div class="empty-state">
+      <h3>No results found</h3>
+      <p>Try broader terms like "CDD", "BOPF", "approval", "status"</p>
+    </div>`;
+    return;
+  }
+  const meta = query
+    ? `<div class="result-count"><strong>${results.length}</strong> results for "<strong>${escHtml(query)}</strong>"</div>`
+    : `<div class="result-count"><strong>${results.length}</strong> knowledge documents</div>`;
+  main.innerHTML = meta + results.map((d, i) => buildCard(d, i)).join('');
+}
+
+function buildCard(doc, idx) {
+  const cat   = (doc.category || 'exports').replace(/[^a-z-]/g, '-');
+  const score = doc.score !== null
+    ? `<div class="card-score-box"><span class="score-num">${doc.score}</span><span class="score-lbl">score</span></div>`
+    : '';
+  const ids = (doc.sapIdentifiers || []).slice(0, 8).map(id =>
+    `<span class="sap-id" onclick="event.stopPropagation();searchFor('${escAttr(id)}')">${escHtml(id)}</span>`
+  ).join('');
+  const sections = (doc.sections || []).slice(0, 3).map(s => `
+    <div class="section-item">
+      <div class="section-heading">${escHtml(s.heading)}</div>
+      <div class="section-snippet">${escHtml((s.snippet||'').slice(0,180))}</div>
+    </div>`).join('');
+
+  return `
+    <div class="result-card" id="card-${idx}" onclick="toggleCard(${idx})">
+      <div class="card-top">
+        <span class="card-cat-badge cat-${cat}">${cat.replace(/-/g,' ')}</span>
+        <div class="card-info">
+          <div class="card-title">${escHtml(doc.title)}</div>
+          <div class="card-path">${escHtml(doc.filePath)}</div>
+          <div class="card-preview">${escHtml((doc.preview||'').slice(0,160))}</div>
+        </div>
+        ${score}
+      </div>
+      ${ids ? `<div class="sap-ids">${ids}</div>` : ''}
+      <div class="card-expand" id="detail-${idx}" style="display:none">
+        <div class="card-sections">${sections}</div>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();loadFullContent(${idx},'${escAttr(doc.filePath)}')">📄 View full file</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();printFile('${escAttr(doc.filePath)}','${escAttr(doc.title)}')">🖨️ Print</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();askBot('Explain: '+${JSON.stringify(doc.title)});toggleChat()">💬 Ask bot</button>
+        </div>
+        <div id="full-${idx}"></div>
+      </div>
+    </div>`;
+}
+
+function toggleCard(idx) {
+  const d = document.getElementById('detail-' + idx);
+  const c = document.getElementById('card-'   + idx);
+  const open = d.style.display !== 'none';
+  d.style.display = open ? 'none' : 'block';
+  c.classList.toggle('expanded', !open);
+}
+
+async function loadFullContent(idx, filePath) {
+  const el = document.getElementById('full-' + idx);
+  if (el.innerHTML) return;
+  el.innerHTML = '<div class="spinner"></div>';
+  try {
+    const text = await (await fetch('/api/content?file=' + encodeURIComponent(filePath))).text();
+    el.innerHTML = `<pre class="card-full-content">${escHtml(text)}</pre>`;
+  } catch (e) {
+    el.innerHTML = `<div class="error-box" style="margin:12px">Could not load: ${escHtml(e.message)}</div>`;
+  }
+}
+
+function renderOnlineResults(data, query) {
+  const main = document.getElementById('mainContent');
+  if (data.error) {
+    main.innerHTML = `
+      <div class="error-box">
+        <strong>Online search failed:</strong> ${escHtml(data.error)}<br>
+        <span style="font-size:12px;margin-top:4px;display:block">
+          Start MCP server: <code>java -jar jco-service/target/jco-service-1.0.0.jar --mcp</code>
+        </span>
+      </div>`;
+    return;
+  }
+  const items = (data.results || []).map(r => `
+    <div class="online-card">
+      <span class="obj-type-badge">${escHtml(r.type||'OBJ')}</span>
+      <div>
+        <div class="obj-name">${escHtml(r.name||r.objectName||'')}</div>
+        <div class="obj-desc">${escHtml(r.description||r.desc||'')}</div>
+        <div class="obj-pkg">${escHtml(r.packageName||r.package||'')}</div>
+      </div>
+    </div>`).join('');
+  main.innerHTML = `
+    <div class="result-count"><strong>${(data.results||[]).length}</strong> live SAP results for "<strong>${escHtml(query)}</strong>"</div>
+    ${items || '<div class="empty-state"><h3>No results</h3></div>'}`;
+}
+
+// ─── File Viewer ───────────────────────────────────────────────────────────
+async function loadKnowledgeFile(filePath, title) {
+  switchTab('search'); // reuse main content area
+  const main = document.getElementById('mainContent');
+  main.innerHTML = `<div class="spinner"></div>`;
+  try {
+    const text = await (await fetch('/api/content?file=' + encodeURIComponent(filePath))).text();
+    main.innerHTML = `
+      <div style="max-width:900px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <h2 style="font-size:16px;font-weight:600;color:var(--text)">${escHtml(title)}</h2>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="printFile('${escAttr(filePath)}','${escAttr(title)}')">🖨️ Print / PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="switchTab('launchpad')">← Home</button>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border-lt);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+          <pre style="font-size:12.5px;line-height:1.75;color:var(--text);white-space:pre-wrap;word-break:break-word;font-family:'Courier New',Courier,monospace">${escHtml(text)}</pre>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text3)">${escHtml(filePath)}</div>
+      </div>`;
+  } catch(e) {
+    main.innerHTML = `<div class="error-box">Cannot load file: ${escHtml(e.message)}</div>`;
+  }
+}
+
+// ─── Hierarchy (file browser) ──────────────────────────────────────────────
+async function renderHierarchy() {
+  const main = document.getElementById('mainContent');
+  main.innerHTML = '<div class="spinner"></div>';
+  try {
+    const { files } = await (await fetch('/api/knowledge/list')).json();
+    const CAT_ICONS = {
+      processes:'⚙️', bopf:'🔷', tables:'📊', patterns:'🧩', wiki:'📖',
+      abap:'💻', exports:'📦', 'master-data':'📋', authorization:'🔐',
+      ddic:'🗄️', domains:'🔤', integrations:'🔗', messages:'💬', crawl:'🕷', graph:'📈'
+    };
+    let html = '<div class="tree-wrap">';
+    html += `<h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px">🗂 Knowledge File Browser</h2>`;
+    for (const f of files) {
+      if (f.type !== 'dir') continue;
+      const mdFiles = (f.children||[]).filter(c => c.type === 'file');
+      if (!mdFiles.length) continue;
+      html += `<div class="tree-dir">
+        <div class="tree-dir-header">
+          <span>${CAT_ICONS[f.name]||'📁'}</span>
+          <span>${f.name}</span>
+          <span style="margin-left:auto;font-weight:400">${mdFiles.length} file${mdFiles.length>1?'s':''}</span>
+        </div>`;
+      for (const c of mdFiles) {
+        html += `<div class="tree-file" onclick="loadKnowledgeFile('${escAttr(c.path)}','${escAttr(c.name)}')">
+          <span style="color:var(--text3);font-size:13px">${c.ext==='.md'?'📝':c.ext==='.abap'?'💾':'📄'}</span>
+          <span class="tree-file-name">${escHtml(c.name)}</span>
+          <span class="tree-file-size">${Math.round(c.size/1024*10)/10} KB</span>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();printFile('${escAttr(c.path)}','${escAttr(c.name)}')" style="margin-left:8px">🖨️</button>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    main.innerHTML = html;
+  } catch(e) {
+    main.innerHTML = `<div class="error-box">${escHtml(e.message)}</div>`;
+  }
+}
+
+// ─── Feature Analyzer ─────────────────────────────────────────────────────
+function openAnalyzer()  { document.getElementById('analyzerOverlay').classList.add('open'); }
+function closeAnalyzer() { document.getElementById('analyzerOverlay').classList.remove('open'); }
+
+async function runAnalysis() {
+  const req = document.getElementById('analyzerInput').value.trim();
+  if (!req) return;
+  const out = document.getElementById('analyzerResult');
+  out.innerHTML = '<div class="spinner" style="margin:16px 0"></div>';
+  try {
+    const data = await (await fetch('/api/analyze', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requirement: req })
+    })).json();
+    if (data.error) throw new Error(data.error);
+    const srcs = (data.sources||[]).slice(0,5).map(s => `
+      <div class="src-item">
+        <span class="src-title" onclick="loadKnowledgeFile('${escAttr(s.filePath)}','${escAttr(s.title)}');closeAnalyzer()">${escHtml(s.title)}</span>
+        <span class="src-path">${escHtml(s.filePath)}</span>
+        <span class="src-score">★ ${s.score}</span>
+      </div>`).join('');
+    out.innerHTML = `
+      <div class="analyzer-out">${escHtml(data.analysis)}</div>
+      ${srcs ? `<div class="success-box" style="margin-top:12px;padding:0">
+        <div style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Top Matching Files (click to open)</div>
+        <div class="analyzer-sources">${srcs}</div>
+      </div>` : ''}`;
+  } catch(e) {
+    out.innerHTML = `<div class="error-box">${escHtml(e.message)}</div>`;
+  }
+}
+
+// ─── PDF Export ────────────────────────────────────────────────────────────
+async function exportPDF() {
+  const pw = window.open('', '_blank');
+  pw.document.write(`<html><head><title>SAP Knowledge Base</title>
+    <style>body{font-family:monospace;font-size:10.5px;line-height:1.65;color:#000;max-width:850px;margin:0 auto;padding:20px}
+    h1{font-size:16px;border-bottom:2px solid #000;padding-bottom:6px;margin:0 0 16px}
+    h2{font-size:13px;color:#354a5e;margin:28px 0 8px;border-bottom:1px solid #ccc;padding-bottom:3px}
+    pre{background:#f5f5f5;border:1px solid #ddd;padding:10px;font-size:9.5px;white-space:pre-wrap;word-break:break-word;margin:0 0 8px}
+    hr{border:none;border-top:1px solid #ddd;margin:20px 0}
+    @media print{h2{page-break-before:auto}}</style></head><body>`);
+  pw.document.write(`<h1>SAP CDD/BOPF Knowledge Base — ${new Date().toLocaleDateString()}</h1>`);
+  try {
+    const { files } = await (await fetch('/api/knowledge/list')).json();
+    const flat = (function flatten(arr){const r=[];for(const f of arr||[]){if(f.type==='file')r.push(f);else r.push(...flatten(f.children));}return r;})(files);
+    for (const f of flat) {
+      try {
+        const t = await (await fetch('/api/content?file='+encodeURIComponent(f.path))).text();
+        pw.document.write(`<h2>${f.path}</h2><pre>${t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre><hr>`);
+      } catch {}
+    }
+  } catch(e) { pw.document.write('<p>Error: '+e.message+'</p>'); }
+  pw.document.write('</body></html>');
+  pw.document.close();
+  setTimeout(() => pw.print(), 900);
+}
+
+function printFile(filePath, title) {
+  const pw = window.open('', '_blank');
+  pw.document.write(`<html><head><title>${title}</title>
+    <style>body{font-family:monospace;font-size:11px;line-height:1.7;max-width:850px;margin:0 auto;padding:20px}
+    pre{white-space:pre-wrap;word-break:break-word}</style></head><body>`);
+  fetch('/api/content?file='+encodeURIComponent(filePath)).then(r=>r.text()).then(t=>{
+    pw.document.write(`<h2>${title}</h2><pre>${t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>`);
+    pw.document.close(); setTimeout(()=>pw.print(),400);
+  });
+}
+
+// ─── Chat Bot ──────────────────────────────────────────────────────────────
+// How the chat bot works (explained simply):
+// 1. You type a question
+// 2. The bot breaks your question into keywords
+// 3. It searches the local knowledge base using BM25 (same as the search bar)
+// 4. It formats the top results as a friendly reply
+// 5. Everything runs locally — no internet or AI API needed
+// (For a "real" AI bot connected to an LLM, you'd send the context to Claude/GPT)
+
+let chatHistory = [];
+
+function initChat() {
+  // Show welcome message when chat first opens
+  chatHistory = [];
+  addBotMessage(
+    `👋 Hi! I'm your CDD Knowledge Assistant.\n\n` +
+    `I can answer questions about:\n` +
+    `• BOPF nodes and their database tables\n` +
+    `• CDD/NCDD business processes\n` +
+    `• Factory class patterns\n` +
+    `• Business terms (W@R, Phase Shift, DR...)\n` +
+    `• Which classes/tables to modify for a feature\n\n` +
+    `Try one of the suggested questions below, or just type! 👇`
+  );
+}
+
+function toggleChat() {
+  const win  = document.getElementById('chatWindow');
+  const icon = document.getElementById('chatFabIcon');
+  const open = win.classList.toggle('open');
+  icon.textContent = open ? '✕' : '💬';
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  askBot(q);
+}
+
+function askBot(question) {
+  addUserMessage(question);
+  // Hide suggestion chips after first message
+  document.getElementById('chatSuggestions').style.display = 'none';
+  // Show typing indicator
+  document.getElementById('chatTyping').classList.add('show');
+  // Small delay to feel more natural
+  setTimeout(() => generateBotReply(question), 600 + Math.random() * 400);
+}
+
+function generateBotReply(question) {
+  document.getElementById('chatTyping').classList.remove('show');
+
+  if (!searchIndex) {
+    addBotMessage('⚠️ The knowledge base index is not loaded yet. Please wait a moment and try again.');
+    return;
+  }
+
+  const results = bm25Search(question, allDocs, searchIndex.index, 5);
+
+  if (!results.length) {
+    addBotMessage(
+      `I couldn't find specific information about "${question}".\n\n` +
+      `Try using more specific SAP terms like:\n` +
+      `• Class names (CL_CDD_*, CL_NCDD_*)\n` +
+      `• Table names (CDD_HEAD, NCDD_HEAD)\n` +
+      `• Business terms (approval, BOPF, status, W@R)`
+    );
+    return;
+  }
+
+  const top = results[0];
+  const otherTitles = results.slice(1, 4).map(r => r.title);
+
+  // Build a reply from the top matching document's sections
+  const topSection = (top.sections || [])[0];
+  let reply = `📚 **${top.title}**\n\n`;
+
+  if (topSection) {
+    reply += `**${topSection.heading}**\n${topSection.snippet.slice(0, 300)}\n\n`;
+  } else {
+    reply += `${(top.preview||'').slice(0, 300)}\n\n`;
+  }
+
+  if (otherTitles.length) {
+    reply += `Also relevant:\n${otherTitles.map(t => `• ${t}`).join('\n')}`;
+  }
+
+  addBotMessage(reply, results.slice(0, 3));
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('chatMessages');
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'msg user';
+  div.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div><div class="msg-time">${time}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addBotMessage(text, sources) {
+  const msgs = document.getElementById('chatMessages');
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+  // Format the text: **bold** → <strong>, newlines → <br>
+  const formatted = escHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+
+  const srcLinks = (sources||[]).slice(0,3).map(s =>
+    `<span class="src-link" onclick="loadKnowledgeFile('${escAttr(s.filePath)}','${escAttr(s.title)}');toggleChat()">
+      📄 ${escHtml(s.title)}
+    </span>`).join(' ');
+
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.innerHTML = `
+    <div class="msg-bubble">${formatted}${srcLinks ? '<br><br>' + srcLinks : ''}</div>
+    <div class="msg-time">${time}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ─── Utilities ─────────────────────────────────────────────────────────────
+function showLoading() {
+  document.getElementById('mainContent').innerHTML = '<div class="spinner"></div>';
+}
+function showError(msg) {
+  document.getElementById('mainContent').innerHTML =
+    `<div class="error-box" style="max-width:600px">${msg}</div>`;
+}
+function searchFor(term) {
+  document.getElementById('searchInput').value = term;
+  switchTab('search');
+  doSearch();
+}
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
+// ─── Start the app ─────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

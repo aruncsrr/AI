@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My APC Tracker</title>
+<style>
+  :root {
+    --blue: #0070f2;
+    --dark: #003366;
+    --bg:   #f4f6f9;
+    --card: #ffffff;
+    --border: #dde1e7;
+    --text: #1a1d23;
+    --muted: #6b7280;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SAP72', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #003366 0%, #0057a8 100%);
+    color: white;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  }
+  .hdr-left { display: flex; align-items: center; gap: 12px; }
+  .hdr-logo {
+    width: 34px; height: 34px;
+    background: var(--blue);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .hdr-title { font-size: 16px; font-weight: 700; }
+  .hdr-sub   { font-size: 11px; opacity: 0.65; margin-top: 2px; }
+  .hdr-url   { font-size: 11px; opacity: 0.6; font-family: monospace; }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .btn-primary {
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #0057b8; }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background 0.15s;
+  }
+  .btn-ghost:hover { background: #f3f4f6; color: var(--text); }
+  .toolbar-count { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+  /* ── Table wrapper — this is the scroll container ── */
+  .table-wrap {
+    flex: 1;
+    overflow: auto;
+  }
+  .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .table-wrap::-webkit-scrollbar-track { background: #f1f3f5; }
+  .table-wrap::-webkit-scrollbar-thumb { background: #c1c8d4; border-radius: 4px; }
+  .table-wrap::-webkit-scrollbar-thumb:hover { background: #9aa3af; }
+
+  /* ── Table ── */
+  .apc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 960px;
+  }
+  .apc-table thead { position: sticky; top: 0; z-index: 10; }
+
+  /* Column header row */
+  .apc-table .row-header th {
+    background: #eef2ff;
+    color: var(--dark);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #cdd5f0;
+    white-space: nowrap;
+  }
+
+  /* Filter row */
+  .apc-table .row-filter th {
+    background: #f8f9ff;
+    padding: 6px 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  .f-input, .f-select {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .f-input:focus, .f-select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(0,112,242,0.12);
+  }
+  .f-input::placeholder { color: #b0b8c4; font-size: 11px; }
+
+  /* Data rows */
+  .apc-table tbody tr { transition: background 0.1s; }
+  .apc-table tbody tr:hover td { background: #f0f5ff; }
+  .apc-table tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #eff0f4;
+    vertical-align: middle;
+    line-height: 1.5;
+  }
+  .td-si      { font-weight: 700; color: var(--dark); text-align: center; width: 54px; }
+  .td-comment { max-width: 220px; word-break: break-word; }
+  .td-actions { white-space: nowrap; width: 140px; }
+
+  /* Hyperlinks */
+  .jira-link {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 12.5px;
+  }
+  .jira-link:hover { text-decoration: underline; color: #0046a8; }
+
+  /* Status badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .badge-wait { background: #fef3c7; color: #92400e; }
+  .badge-prog { background: #dbeafe; color: #1e40af; }
+  .badge-done { background: #dcfce7; color: #166534; }
+  .badge-na   { background: #f3f4f6; color: #4b5563; }
+  .badge-test { background: #ede9fe; color: #5b21b6; }
+
+  /* Action buttons */
+  .btn-edit, .btn-del {
+    background: none;
+    border: 1px solid;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .btn-edit { color: var(--blue); border-color: #bfdbfe; margin-right: 4px; }
+  .btn-edit:hover { background: #eff6ff; }
+  .btn-del  { color: #dc2626; border-color: #fecaca; }
+  .btn-del:hover  { background: #fef2f2; }
+
+  /* Empty state */
+  .empty-row td { text-align: center; padding: 64px 20px; color: #9ca3af; font-style: italic; font-size: 14px; }
+
+  /* ── Modal overlay ── */
+  .modal-wrap {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.52);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-wrap.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 12px;
+    width: 580px;
+    max-width: 96vw;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.38);
+  }
+  .modal-box::-webkit-scrollbar { width: 6px; }
+  .modal-box::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+
+  .modal-hdr {
+    background: linear-gradient(135deg, #003366, #0057a8);
+    color: white;
+    padding: 15px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px 12px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .modal-title { font-size: 15px; font-weight: 700; }
+  .btn-mclose {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-mclose:hover { background: rgba(255,255,255,0.28); }
+
+  .modal-body {
+    padding: 22px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-full { grid-column: 1 / -1; }
+  .field label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .field input, .field select, .field textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0,112,242,0.1);
+  }
+  .field input[readonly] { background: #f3f4f6; color: var(--muted); cursor: default; }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .modal-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #f9fafb;
+    border-radius: 0 0 12px 12px;
+    position: sticky;
+    bottom: 0;
+  }
+  .btn-cancel { background: white; border: 1px solid #d1d5db; padding: 7px 16px; border-radius: 7px; font-size: 13px; cursor: pointer; }
+  .btn-cancel:hover { background: #f3f4f6; }
+  .btn-save   { background: var(--blue); color: white; border: none; padding: 7px 22px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-save:hover { background: #0057b8; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="hdr-left">
+    <div class="hdr-logo">📋</div>
+    <div>
+      <div class="hdr-title">My APC Tracker</div>
+      <div class="hdr-sub">JIRA Task Tracker · Data saved locally in browser</div>
+    </div>
+  </div>
+  <div class="hdr-url">http://localhost:8080/apc-tracker.html</div>
+</header>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <button class="btn-primary" onclick="openForm(null)">+ Add Task</button>
+  <button class="btn-ghost"   onclick="clearFilters()">✕ Clear Filters</button>
+  <span class="toolbar-count" id="count-text"></span>
+</div>
+
+<!-- Scrollable table -->
+<div class="table-wrap">
+  <table class="apc-table">
+    <thead>
+      <!-- Column headers -->
+      <tr class="row-header">
+        <th>SI</th>
+        <th>PI</th>
+        <th>JIRA</th>
+        <th>Status</th>
+        <th>Backlog</th>
+        <th>Dependency</th>
+        <th>Comment</th>
+        <th>Actions</th>
+      </tr>
+      <!-- Filter row -->
+      <tr class="row-filter">
+        <th><input  class="f-input"  id="f-si"      placeholder="Filter…" oninput="applyFilters()"></th>
+        <th><input  class="f-input"  id="f-pi"      placeholder="Filter…" oninput="applyFilters()"></th>
+        <th><input  class="f-input"  id="f-jira"    placeholder="Filter…" oninput="applyFilters()"></th>
+        <th>
+          <select class="f-select" id="f-status" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option>Waiting For Response</option>
+            <option>In Progress</option>
+            <option>Done</option>
+            <option>Not Required</option>
+            <option>Testing Only</option>
+          </select>
+        </th>
+        <th><input  class="f-input"  id="f-backlog"  placeholder="Filter…" oninput="applyFilters()"></th>
+        <th><input  class="f-input"  id="f-dep"      placeholder="Filter…" oninput="applyFilters()"></th>
+        <th><input  class="f-input"  id="f-comment"  placeholder="Filter…" oninput="applyFilters()"></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="apc-tbody"></tbody>
+  </table>
+</div>
+
+<!-- Add / Edit modal -->
+<div class="modal-wrap" id="modal-wrap">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title">Add Task</div>
+      <button class="btn-mclose" onclick="closeForm()">✕</button>
+    </div>
+    <form onsubmit="saveForm(event)">
+      <div class="modal-body">
+
+        <div class="field">
+          <label>SI (Auto)</label>
+          <input id="ff-si" type="number" readonly>
+        </div>
+        <div class="field">
+          <label>PI</label>
+          <select id="ff-pi">
+            <option value="PI26/3">PI26/3</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>JIRA</label>
+          <input id="ff-jira" type="text" placeholder="e.g. APC-3159">
+          <span class="field-hint">Enter ticket ID — shown as a clickable JIRA link</span>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="ff-status">
+            <option>Waiting For Response</option>
+            <option>In Progress</option>
+            <option>Done</option>
+            <option>Not Required</option>
+            <option>Testing Only</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Backlog</label>
+          <input id="ff-backlog" type="text" placeholder="e.g. ITSHECS4HANA-44152">
+          <span class="field-hint">Enter ticket ID — shown as a clickable JIRA link</span>
+        </div>
+        <div class="field">
+          <label>Dependency</label>
+          <input id="ff-dep" type="text" placeholder="e.g. APC-3159">
+          <span class="field-hint">Enter ticket ID — shown as a clickable JIRA link</span>
+        </div>
+
+        <div class="field field-full">
+          <label>Comment</label>
+          <textarea id="ff-comment" placeholder="Free text comment…"></textarea>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeForm()">Cancel</button>
+        <button type="submit" class="btn-save">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── Storage ────────────────────────────────────────────────────────────────
+const STORE = 'apc_tracker_v1';
+let rows    = [];
+let editIdx = null;
+
+function load() {
+  try { rows = JSON.parse(localStorage.getItem(STORE) || '[]'); }
+  catch(e) { rows = []; }
+}
+function persist() { localStorage.setItem(STORE, JSON.stringify(rows)); }
+function nextSI()  { return rows.length ? Math.max(...rows.map(r => r.si)) + 1 : 1; }
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function jiraLink(id) {
+  if (!id) return '<span style="color:#c4c9d4">—</span>';
+  return `<a class="jira-link" href="https://jira.tools.sap/browse/${esc(id)}" target="_blank">${esc(id)}</a>`;
+}
+function badge(status) {
+  const map = {
+    'Waiting For Response': 'wait',
+    'In Progress':          'prog',
+    'Done':                 'done',
+    'Not Required':         'na',
+    'Testing Only':         'test'
+  };
+  return `<span class="badge badge-${map[status] || 'na'}">${esc(status)}</span>`;
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function render() {
+  load();
+  const tbody = document.getElementById('apc-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No tasks yet — click "+ Add Task" to begin.</td></tr>';
+    setCount(0, 0);
+    return;
+  }
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr data-idx="${i}">
+      <td class="td-si">${r.si}</td>
+      <td>${esc(r.pi)}</td>
+      <td>${jiraLink(r.jira)}</td>
+      <td>${badge(r.status)}</td>
+      <td>${jiraLink(r.backlog)}</td>
+      <td>${jiraLink(r.dependency)}</td>
+      <td class="td-comment">${esc(r.comment)}</td>
+      <td class="td-actions">
+        <button class="btn-edit" onclick="openForm(${i})">✏️ Edit</button>
+        <button class="btn-del"  onclick="deleteRow(${i})">🗑️ Delete</button>
+      </td>
+    </tr>`).join('');
+  applyFilters();
+}
+
+// ── Filtering ──────────────────────────────────────────────────────────────
+function applyFilters() {
+  const fsi  = document.getElementById('f-si').value.trim().toLowerCase();
+  const fpi  = document.getElementById('f-pi').value.trim().toLowerCase();
+  const fjira = document.getElementById('f-jira').value.trim().toLowerCase();
+  const fst  = document.getElementById('f-status').value;
+  const fbl  = document.getElementById('f-backlog').value.trim().toLowerCase();
+  const fdep = document.getElementById('f-dep').value.trim().toLowerCase();
+  const fcom = document.getElementById('f-comment').value.trim().toLowerCase();
+
+  let visible = 0;
+  document.querySelectorAll('#apc-tbody tr[data-idx]').forEach(tr => {
+    const r = rows[parseInt(tr.dataset.idx)];
+    const ok =
+      (!fsi   || String(r.si).includes(fsi))                          &&
+      (!fpi   || (r.pi         || '').toLowerCase().includes(fpi))    &&
+      (!fjira || (r.jira       || '').toLowerCase().includes(fjira))  &&
+      (!fst   || r.status === fst)                                     &&
+      (!fbl   || (r.backlog    || '').toLowerCase().includes(fbl))    &&
+      (!fdep  || (r.dependency || '').toLowerCase().includes(fdep))   &&
+      (!fcom  || (r.comment    || '').toLowerCase().includes(fcom));
+    tr.style.display = ok ? '' : 'none';
+    if (ok) visible++;
+  });
+  setCount(visible, rows.length);
+}
+
+function clearFilters() {
+  ['f-si','f-pi','f-jira','f-backlog','f-dep','f-comment'].forEach(id =>
+    document.getElementById(id).value = '');
+  document.getElementById('f-status').value = '';
+  applyFilters();
+}
+
+function setCount(visible, total) {
+  document.getElementById('count-text').textContent =
+    visible === total
+      ? `${total} task${total !== 1 ? 's' : ''}`
+      : `${visible} of ${total} tasks (filtered)`;
+}
+
+// ── Form ───────────────────────────────────────────────────────────────────
+function openForm(idx) {
+  editIdx = idx;
+  const isEdit = idx !== null;
+  const r = isEdit ? rows[idx] : null;
+  document.getElementById('modal-title').textContent = isEdit ? '✏️ Edit Task' : '+ Add Task';
+  document.getElementById('ff-si').value      = isEdit ? r.si               : nextSI();
+  document.getElementById('ff-pi').value      = isEdit ? r.pi               : 'PI26/3';
+  document.getElementById('ff-jira').value    = isEdit ? (r.jira       || ''): '';
+  document.getElementById('ff-status').value  = isEdit ? r.status           : 'In Progress';
+  document.getElementById('ff-backlog').value = isEdit ? (r.backlog    || ''): '';
+  document.getElementById('ff-dep').value     = isEdit ? (r.dependency || ''): '';
+  document.getElementById('ff-comment').value = isEdit ? (r.comment    || ''): '';
+  document.getElementById('modal-wrap').classList.add('open');
+}
+function closeForm() { document.getElementById('modal-wrap').classList.remove('open'); }
+
+function saveForm(e) {
+  e.preventDefault();
+  const row = {
+    si:         parseInt(document.getElementById('ff-si').value),
+    pi:         document.getElementById('ff-pi').value,
+    jira:       document.getElementById('ff-jira').value.trim(),
+    status:     document.getElementById('ff-status').value,
+    backlog:    document.getElementById('ff-backlog').value.trim(),
+    dependency: document.getElementById('ff-dep').value.trim(),
+    comment:    document.getElementById('ff-comment').value.trim(),
+  };
+  if (editIdx !== null) { rows[editIdx] = row; } else { rows.push(row); }
+  persist();
+  closeForm();
+  render();
+}
+
+function deleteRow(idx) {
+  if (!confirm('Delete this task?')) return;
+  rows.splice(idx, 1);
+  persist();
+  render();
+}
+
+// Close modal on backdrop click
+document.getElementById('modal-wrap').addEventListener('click', function(e) {
+  if (e.target === this) closeForm();
+});
+
+// Init
+render();
+</script>
+</body>
+</html>

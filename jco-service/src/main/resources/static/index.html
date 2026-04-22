@@ -497,6 +497,8 @@
     </div>
   </div>
   <div class="header-right">
+    <a class="apc-launch-btn go-offline-btn" href="/offline-dashboard.html">📁 Go Offline</a>
+    <button class="apc-launch-btn" onclick="window.open('/apc-tracker.html','_blank')">📋 My APC</button>
     <div>
       <span class="status-dot" id="status-dot"></span>
       <span id="status-text">Connecting…</span>
@@ -905,6 +907,381 @@ function escHtml(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+</script>
+
+<!-- ══ MY APC TRACKER ════════════════════════════════════════════════════════ -->
+<style>
+.apc-launch-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+.apc-launch-btn:hover { background: rgba(255,255,255,0.28); }
+.go-offline-btn { background: rgba(251,191,36,0.18); border-color: rgba(251,191,36,0.45); text-decoration: none; }
+.go-offline-btn:hover { background: rgba(251,191,36,0.32); }
+
+.apc-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+.apc-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 96vw;
+  max-width: 1140px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.38);
+  overflow: hidden;
+}
+.apc-modal-hdr {
+  background: linear-gradient(135deg, #003366 0%, #0057a8 100%);
+  color: white;
+  padding: 15px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.apc-modal-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.apc-close-btn {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.apc-close-btn:hover { background: rgba(255,255,255,0.28); }
+
+.apc-toolbar {
+  padding: 11px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f9fafb;
+  flex-shrink: 0;
+}
+.apc-add-btn {
+  background: #0070f2;
+  color: white;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.apc-add-btn:hover { background: #0057b8; }
+.apc-task-count { font-size: 12px; color: #6b7280; }
+
+.apc-table-wrap { overflow: auto; flex: 1; }
+.apc-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.apc-tbl th {
+  background: #f0f4ff;
+  color: #003366;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 2px solid #dde1e7;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.apc-tbl td {
+  padding: 9px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+  line-height: 1.5;
+}
+.apc-tbl tr:hover td { background: #f8faff; }
+.apc-si { font-weight: 700; color: #003366; text-align: center; }
+.apc-link { color: #0070f2; text-decoration: none; font-weight: 500; }
+.apc-link:hover { text-decoration: underline; }
+.apc-empty { text-align: center; padding: 48px; color: #9ca3af; font-style: italic; }
+.apc-action-btn {
+  background: none;
+  border: 1px solid #d1d5db;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.apc-action-btn.edit { color: #0070f2; border-color: #bfdbfe; }
+.apc-action-btn.edit:hover { background: #eff6ff; }
+.apc-action-btn.del  { color: #dc2626; border-color: #fecaca; }
+.apc-action-btn.del:hover  { background: #fef2f2; }
+
+.apc-badge { display: inline-block; padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.apc-badge-wait { background: #fef3c7; color: #92400e; }
+.apc-badge-prog { background: #dbeafe; color: #1e40af; }
+.apc-badge-done { background: #dcfce7; color: #166534; }
+.apc-badge-na   { background: #f3f4f6; color: #4b5563; }
+.apc-badge-test { background: #ede9fe; color: #5b21b6; }
+
+/* Form modal */
+.apc-form-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.62);
+  z-index: 9100;
+  align-items: center;
+  justify-content: center;
+}
+.apc-form-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 560px;
+  max-width: 96vw;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.42);
+  overflow: hidden;
+}
+.apc-form-body {
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.apc-field { display: flex; flex-direction: column; gap: 5px; }
+.apc-field-full { grid-column: 1 / -1; }
+.apc-field label { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.04em; }
+.apc-field input, .apc-field select, .apc-field textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1f2937;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.apc-field input:focus, .apc-field select:focus, .apc-field textarea:focus {
+  border-color: #0070f2;
+  box-shadow: 0 0 0 3px rgba(0,112,242,0.1);
+}
+.apc-field input[readonly] { background: #f3f4f6; color: #6b7280; }
+.apc-field textarea { resize: vertical; min-height: 80px; }
+.apc-form-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #f9fafb;
+}
+.apc-cancel-btn { background: white; border: 1px solid #d1d5db; padding: 7px 16px; border-radius: 7px; font-size: 13px; cursor: pointer; }
+.apc-cancel-btn:hover { background: #f3f4f6; }
+.apc-save-btn { background: #0070f2; color: white; border: none; padding: 7px 22px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.apc-save-btn:hover { background: #0057b8; }
+</style>
+
+<!-- APC main overlay -->
+<div id="apc-overlay" class="apc-overlay">
+  <div class="apc-modal">
+    <div class="apc-modal-hdr">
+      <div class="apc-modal-title">📋 My APC Tracker</div>
+      <button class="apc-close-btn" onclick="apcClose()">✕</button>
+    </div>
+    <div class="apc-toolbar">
+      <button class="apc-add-btn" onclick="apcOpenForm(null)">+ Add Task</button>
+      <span class="apc-task-count" id="apc-count"></span>
+    </div>
+    <div class="apc-table-wrap">
+      <table class="apc-tbl">
+        <thead>
+          <tr>
+            <th>SI</th>
+            <th>PI</th>
+            <th>JIRA</th>
+            <th>Status</th>
+            <th>Backlog</th>
+            <th>Dependency</th>
+            <th>Comment</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="apc-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- APC add/edit form -->
+<div id="apc-form-overlay" class="apc-form-overlay">
+  <div class="apc-form-modal">
+    <div class="apc-modal-hdr">
+      <div class="apc-modal-title" id="apc-form-title">Add Task</div>
+      <button class="apc-close-btn" onclick="apcCloseForm()">✕</button>
+    </div>
+    <form onsubmit="apcSaveForm(event)">
+      <div class="apc-form-body">
+        <div class="apc-field">
+          <label>SI (Auto)</label>
+          <input id="apc-f-si" type="number" readonly>
+        </div>
+        <div class="apc-field">
+          <label>PI</label>
+          <select id="apc-f-pi">
+            <option value="PI26/3">PI26/3</option>
+          </select>
+        </div>
+        <div class="apc-field">
+          <label>JIRA (e.g. APC-3159)</label>
+          <input id="apc-f-jira" type="text" placeholder="APC-3159">
+        </div>
+        <div class="apc-field">
+          <label>Status</label>
+          <select id="apc-f-status">
+            <option>Waiting For Response</option>
+            <option>In Progress</option>
+            <option>Done</option>
+            <option>Not Required</option>
+            <option>Testing Only</option>
+          </select>
+        </div>
+        <div class="apc-field">
+          <label>Backlog (e.g. ITSHECS4HANA-44152)</label>
+          <input id="apc-f-backlog" type="text" placeholder="ITSHECS4HANA-44152">
+        </div>
+        <div class="apc-field">
+          <label>Dependency</label>
+          <input id="apc-f-dep" type="text" placeholder="Enter dependency…">
+        </div>
+        <div class="apc-field apc-field-full">
+          <label>Comment</label>
+          <textarea id="apc-f-comment" placeholder="Free text comment…"></textarea>
+        </div>
+      </div>
+      <div class="apc-form-footer">
+        <button type="button" class="apc-cancel-btn" onclick="apcCloseForm()">Cancel</button>
+        <button type="submit" class="apc-save-btn">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── APC Tracker ────────────────────────────────────────────────────────────
+const APC_STORE = 'apc_tracker_v1';
+let apcRows    = [];
+let apcEditIdx = null;
+
+function _apcLoad() {
+  try { apcRows = JSON.parse(localStorage.getItem(APC_STORE) || '[]'); }
+  catch(e) { apcRows = []; }
+}
+function _apcSave() { localStorage.setItem(APC_STORE, JSON.stringify(apcRows)); }
+function _apcNextSI() { return apcRows.length ? Math.max(...apcRows.map(r => r.si)) + 1 : 1; }
+function _apcEsc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _apcBadge(status) {
+  const map = { 'Waiting For Response':'wait','In Progress':'prog','Done':'done','Not Required':'na','Testing Only':'test' };
+  return `<span class="apc-badge apc-badge-${map[status]||'na'}">${_apcEsc(status)}</span>`;
+}
+function _apcJiraLink(id) {
+  if (!id) return '';
+  return `<a class="apc-link" href="https://jira.tools.sap/browse/${_apcEsc(id)}" target="_blank">${_apcEsc(id)}</a>`;
+}
+
+function openAPC() {
+  _apcLoad();
+  _apcRender();
+  document.getElementById('apc-overlay').style.display = 'flex';
+}
+function apcClose() { document.getElementById('apc-overlay').style.display = 'none'; }
+
+function _apcRender() {
+  const tbody = document.getElementById('apc-tbody');
+  document.getElementById('apc-count').textContent = apcRows.length + ' task' + (apcRows.length !== 1 ? 's' : '');
+  if (!apcRows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="apc-empty">No tasks yet — click "+ Add Task" to begin.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = apcRows.map((r, i) => `
+    <tr>
+      <td class="apc-si">${r.si}</td>
+      <td>${_apcEsc(r.pi)}</td>
+      <td>${_apcJiraLink(r.jira)}</td>
+      <td>${_apcBadge(r.status)}</td>
+      <td>${_apcJiraLink(r.backlog)}</td>
+      <td>${_apcEsc(r.dependency)}</td>
+      <td style="max-width:200px;word-break:break-word">${_apcEsc(r.comment)}</td>
+      <td style="white-space:nowrap">
+        <button class="apc-action-btn edit" onclick="apcOpenForm(${i})">✏️ Edit</button>
+        <button class="apc-action-btn del"  onclick="apcDelete(${i})">🗑️ Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+function apcOpenForm(idx) {
+  _apcLoad();
+  apcEditIdx = idx;
+  const isEdit = idx !== null;
+  const r = isEdit ? apcRows[idx] : null;
+  document.getElementById('apc-form-title').textContent = isEdit ? '✏️ Edit Task' : '+ Add Task';
+  document.getElementById('apc-f-si').value      = isEdit ? r.si               : _apcNextSI();
+  document.getElementById('apc-f-pi').value      = isEdit ? r.pi               : 'PI26/3';
+  document.getElementById('apc-f-jira').value    = isEdit ? (r.jira||'')       : '';
+  document.getElementById('apc-f-status').value  = isEdit ? r.status           : 'In Progress';
+  document.getElementById('apc-f-backlog').value = isEdit ? (r.backlog||'')    : '';
+  document.getElementById('apc-f-dep').value     = isEdit ? (r.dependency||'') : '';
+  document.getElementById('apc-f-comment').value = isEdit ? (r.comment||'')    : '';
+  document.getElementById('apc-form-overlay').style.display = 'flex';
+}
+function apcCloseForm() { document.getElementById('apc-form-overlay').style.display = 'none'; }
+
+function apcSaveForm(e) {
+  e.preventDefault();
+  const row = {
+    si:         parseInt(document.getElementById('apc-f-si').value),
+    pi:         document.getElementById('apc-f-pi').value,
+    jira:       document.getElementById('apc-f-jira').value.trim(),
+    status:     document.getElementById('apc-f-status').value,
+    backlog:    document.getElementById('apc-f-backlog').value.trim(),
+    dependency: document.getElementById('apc-f-dep').value.trim(),
+    comment:    document.getElementById('apc-f-comment').value.trim(),
+  };
+  if (apcEditIdx !== null) { apcRows[apcEditIdx] = row; } else { apcRows.push(row); }
+  _apcSave();
+  apcCloseForm();
+  _apcRender();
+}
+
+function apcDelete(idx) {
+  if (!confirm('Delete this task?')) return;
+  apcRows.splice(idx, 1);
+  _apcSave();
+  _apcRender();
+}
+
+document.getElementById('apc-overlay').addEventListener('click', function(e) { if (e.target === this) apcClose(); });
+document.getElementById('apc-form-overlay').addEventListener('click', function(e) { if (e.target === this) apcCloseForm(); });
 </script>
 </body>
 </html>

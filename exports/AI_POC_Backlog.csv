@@ -1,0 +1,75 @@
+Epic,Ticket ID,Title,Description,Acceptance Criteria,Story Points,Priority,Status
+Analysis,A-1,Technical approach analysis for SAP AI Launchpad POC,"Analyze sap-rpt-1 model capabilities, API surface, supported use cases, and token/context limits. Compare against POC requirements. Produce a capability matrix.","- Capability matrix document produced
+- API surface documented (endpoints, auth, limits)
+- Supported use cases identified
+- Gaps vs. POC requirements listed",5,High,To Do
+Analysis,A-2,Define POC evaluation criteria & success metrics,"Define what good looks like: response quality, latency, hallucination rate, coverage of CDD/NCDD domain questions.","- Success metrics defined and agreed by team
+- Minimum quality threshold set per metric
+- Evaluation scoring template created",3,High,To Do
+Analysis,A-3,Identify data sources for grounding / RAG,"Determine which SAP data (ABAP source, DDIC, CDS views, CDD CR data) to feed as context. Decide: pure prompt-based vs. retrieval-augmented.","- Data source list finalized
+- Grounding strategy decided (prompt-only vs. RAG)
+- Decision recorded as ADR",5,High,To Do
+Analysis,A-4,Assess data privacy & compliance constraints,"Check what data can be sent to BTP AI Launchpad. Identify PII, transport-sensitive data, and any restrictions on sending ABAP source code externally.","- Compliance review completed
+- List of data types approved/restricted produced
+- Sign-off from compliance/security owner",3,High,To Do
+Analysis,A-5,Benchmark sap-rpt-1 vs. existing sap-ai-assistant RAG approach,"Run same set of test prompts against both approaches. Document quality differences and coverage gaps.","- Min. 20 prompts tested on both approaches
+- Comparative results documented
+- Recommendation on which to proceed with",5,Medium,To Do
+Architecture,AR-1,Design POC system architecture on BTP,"Define component diagram: BTP subaccount → AI Launchpad → sap-rpt-1 → integration layer → consumer (UI or API).","- Component diagram produced
+- All integration points documented
+- Architecture reviewed and approved by team",5,High,To Do
+Architecture,AR-2,Decide on grounding strategy,"Architecture decision: direct prompt injection vs. RAG with vector store (SAP HANA Vector Engine or AI Core vector embedding). Produce ADR.","- ADR produced and agreed
+- Chosen approach documented with rationale
+- Rejected alternatives documented",5,High,To Do
+Architecture,AR-3,Define API integration layer design,"Design the service bridging SAP system data and the AI Launchpad model API. Decide: Node.js adapter, CAP service, or direct BTP integration.","- Integration layer design documented
+- Technology choice made and justified
+- API contract (request/response schema) defined",3,Medium,To Do
+Architecture,AR-4,Security & auth architecture,"mTLS/OAuth2 setup for BTP AI Core service binding. Define how credentials are managed (BTP credentials store).","- Auth flow diagram produced
+- Credential management approach defined
+- No hardcoded secrets in any design",3,High,To Do
+Landscape Setup,L-1,Provision BTP subaccount for AI POC,"Create or reuse BTP subaccount. Assign required entitlements: SAP AI Launchpad, SAP AI Core, HANA Cloud (if needed for vector store).","- BTP subaccount provisioned and accessible
+- Required entitlements assigned
+- Team members have appropriate access",3,High,To Do
+Landscape Setup,L-2,Set up SAP AI Launchpad instance,"Provision AI Launchpad service instance on BTP. Configure AI Core runtime. Deploy sap-rpt-1 model deployment in AI Core.","- AI Launchpad instance running
+- AI Core resource group configured
+- sap-rpt-1 model deployment active and reachable",5,High,To Do
+Landscape Setup,L-3,Configure service bindings & API access,"Create AI Core service binding. Generate OAuth2 client credentials. Validate connectivity from development environment to AI Launchpad API endpoint.","- Service binding created
+- OAuth2 token can be obtained successfully
+- Test API call to inference endpoint returns valid response",3,High,To Do
+Landscape Setup,L-4,Set up development environment,"Configure local or BTP-hosted dev environment to call AI Core inference API. Set up .env / BTP credentials for POC app.","- Dev environment configured for all POC developers
+- Credentials stored securely (not in repo)
+- Sample call to API works from dev machine",2,Medium,To Do
+Landscape Setup,L-5,Validate ISD/SAP system connectivity for data extraction,"Confirm that the existing SAP MCP ADT connection (ISD system) can serve as the data source pipeline for grounding content.","- Connection from POC environment to ISD confirmed
+- Sample ABAP object fetch via ADT API works
+- Data extraction pipeline end-to-end validated",2,Medium,To Do
+Development,D-1,Implement AI Launchpad API client,"Build a thin client that calls the sap-rpt-1 inference endpoint via AI Core REST API. Handle auth, retry, and error responses.","- Client handles OAuth2 token refresh
+- Retry logic for transient errors implemented
+- Unit tests cover success and error paths",5,High,To Do
+Development,D-2,Build data extraction pipeline from ISD,"Extend existing weekly-sync pipeline to export CDD/NCDD-relevant data (classes, CDS views, DDIC) as structured context for prompts.","- Pipeline exports CDD-relevant objects in structured format
+- Output usable as prompt context or vector embedding input
+- Incremental sync (only changed objects) works correctly",5,High,To Do
+Development,D-3,Implement prompt engineering layer,"Design and test system prompts tailored to CDD/NCDD domain. Implement prompt templates for key use cases (CR analysis, W@R classification, impact assessment).","- System prompt template defined and tested
+- At least 3 use-case-specific prompt templates implemented
+- Prompt outputs reviewed for quality and hallucination",8,High,To Do
+Development,D-4,Implement RAG / context injection (if chosen in AR-2),"Build retrieval layer: embed knowledge base chunks, store in vector DB, retrieve top-K relevant chunks per query, inject into prompt context.","- Chunking strategy defined and implemented
+- Vector embeddings generated for knowledge base
+- Retrieval returns relevant chunks for test queries
+- Injected context improves response quality vs. no-RAG baseline",8,Medium,To Do
+Development,D-5,Build POC UI or API endpoint,"Simple chat interface or REST endpoint to query the model with CDD domain questions. Can be a BTP CAP app or standalone Node.js service.","- POC UI/API accessible to stakeholders
+- Supports free-text question input
+- Returns formatted response with source references (if RAG)",5,Medium,To Do
+Development,D-6,Integrate W@R scenario classification as a test case,"Implement a specific prompt/flow that classifies a given CDD CR line item into W@R scenario 1-6. Use as a concrete POC capability demo.","- W@R scenario 1-6 definitions used as prompt context
+- Model correctly classifies at least 80% of test CR items
+- Classification output includes reasoning",5,High,To Do
+Development,D-7,Run POC evaluation and document results,"Execute the test set defined in A-2 against the live model. Record accuracy, latency, and failure modes. Produce POC findings report.","- All test cases from T-1 executed
+- Results documented against metrics from A-2
+- POC findings report produced and shared with stakeholders",5,High,To Do
+Testing & Evaluation,T-1,Define test question set for CDD/NCDD domain,"Curate 20-30 representative questions spanning CR analysis, W@R scenarios, approval logic, and DDIC lookups.","- Minimum 20 questions defined
+- Questions cover all target use cases
+- Expected answers documented for scoring",3,High,To Do
+Testing & Evaluation,T-2,Evaluate model response quality (manual review),"Score responses against expected answers. Measure: correctness, hallucination rate, relevance, and completeness.","- All test questions scored
+- Hallucination rate < defined threshold
+- Summary of failure patterns produced",5,High,To Do
+Testing & Evaluation,T-3,Latency & cost profiling,"Measure end-to-end response times and token consumption. Estimate monthly cost at target usage volume.","- p50/p95 latency measured and documented
+- Token consumption per query profiled
+- Monthly cost estimate at 3 usage tiers produced",3,Medium,To Do

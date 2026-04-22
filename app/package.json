@@ -1,0 +1,14 @@
+{
+  "name": "sap-knowledge-app",
+  "version": "1.0.0",
+  "description": "SAP CDD/BOPF/Provisioning offline/online knowledge search application",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build-index": "node ../pipeline/build-search-index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

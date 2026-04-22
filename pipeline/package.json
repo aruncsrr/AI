@@ -9,7 +9,10 @@
     "phase3": "node cdd-crawler.js --phase 3",
     "fix": "node fix-manifest.js",
     "graph": "node graph-builder.js",
-    "export": "node export-builder.js"
+    "export": "node export-builder.js",
+    "index": "node build-search-index.js",
+    "sync": "node weekly-sync.js",
+    "setup-cron": "node -e \"const {execSync}=require('child_process');const cmd='0 6 * * 1 cd $(pwd) && node pipeline/weekly-sync.js >> logs/sync.log 2>&1';execSync('(crontab -l 2>/dev/null; echo \\\"'+cmd+'\\\") | crontab -');console.log('Cron job added: every Monday 6am');\""
   },
   "engines": {
     "node": ">=18.0.0"

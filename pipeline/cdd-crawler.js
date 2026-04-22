@@ -222,28 +222,55 @@ class McpProcess {
 // Pool of N persistent MCP processes for concurrent calls
 class McpPool {
   constructor(size) {
-    this.workers = Array.from({ length: size }, () => { const p = new McpProcess(); p.start(); return p; });
+    this.size    = size;
+    this.workers = [];
     this.idx     = 0;
+    this._ready  = false;
+    this._readyQ = [];
   }
+
+  async init() {
+    // Start workers one by one to avoid overwhelming the system
+    for (let i = 0; i < this.size; i++) {
+      const p = new McpProcess();
+      p.start();
+      this.workers.push(p);
+    }
+    // Wait for all workers to be ready (poll with timeout)
+    const deadline = Date.now() + 30000;
+    while (Date.now() < deadline) {
+      if (this.workers.every(w => w.ready)) break;
+      await new Promise(r => setTimeout(r, 200));
+    }
+    const notReady = this.workers.filter(w => !w.ready).length;
+    if (notReady > 0) throw new Error(`${notReady}/${this.size} MCP workers failed to initialize`);
+    this._ready = true;
+  }
+
   call(toolName, input) {
+    if (!this._ready) throw new Error('McpPool not initialized — call await pool.init() first');
     const worker = this.workers[this.idx % this.workers.length];
     this.idx++;
     return worker.call(toolName, input);
   }
+
   stop() { this.workers.forEach(w => w.stop()); }
 }
 
 let mcpPool = null;
+let mcpPoolInit = null;
 
-function getPool() {
+async function getPool() {
   if (!mcpPool) {
     mcpPool = new McpPool(concurrency);
+    mcpPoolInit = mcpPool.init();
   }
+  await mcpPoolInit;
   return mcpPool;
 }
 
 async function callTool(toolName, input) {
-  return getPool().call(toolName, input);
+  return (await getPool()).call(toolName, input);
 }
 
 async function checkServerHealth() {
